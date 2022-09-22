@@ -8,8 +8,16 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "fs": "^0.0.1-security",
+    "lz4": "^0.6.5",
+    "lz4-napi": "^2.0.3",
+    "lz4js": "^0.2.0",
+    "path": "^0.12.7",
+    "protobufjs": "^7.1.1",
+    "stream": "^0.0.2",
     "vue": "^3.2.13",
-    "vue-class-component": "^8.0.0-0"
+    "vue-class-component": "^8.0.0-0",
+    "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",
