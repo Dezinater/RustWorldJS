@@ -3,7 +3,7 @@ import { BLOCK_SIZE } from "./LZ4Helper";
 import { ChunkFlags } from "./LZ4Helper";
 import { memcpy } from "./LZ4Helper";
 
-export default class LZ4Stream {
+export default class LZ4Reader {
     bytes: Uint8Array;
     dataview: DataView;
     _bufferOffset: number;

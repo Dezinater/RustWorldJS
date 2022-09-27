@@ -1,6 +1,6 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import LZ4Stream from './LZ4Stream';
+//import { createApp } from 'vue'
+//import App from './App.vue'
+import LZ4Stream from './LZ4Reader';
 import { WorldData } from './proto/WorldData';
 import TerrainMap from './rust/TerrainMap';
 //var Buffer = require('buffer').Buffer
@@ -8,9 +8,9 @@ import TerrainMap from './rust/TerrainMap';
 //var lz4 = require('./lz4.min.js')
 
 //const { uncompress } = require('lz4-napi');
-var lz4 = require("lz4js");
+//var lz4 = require("lz4js");
 
-createApp(App).mount('#app');
+//createApp(App).mount('#app');
 //decode(new DataView(new ArrayBuffer(0)));
 
 /*

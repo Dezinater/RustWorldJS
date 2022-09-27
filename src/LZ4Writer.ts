@@ -1,7 +1,7 @@
 let lz4 = require("./lz4/lz4.js");
-import { Worker } from 'worker_threads';
+//import { Worker } from 'worker_threads';
 
-new Worker(new URL('./worker.js', import.meta.url));
+//new Worker(new URL('./worker.js'));
 //let lz4 = require("lz4js");
 import { BLOCK_SIZE } from "./LZ4Helper";
 import { ChunkFlags } from "./LZ4Helper";
@@ -32,7 +32,11 @@ export default class LZ4Writer {
             console.log("Flushed " + this.readPosition + " " + this.writePosition + " " + this.bytes.byteLength);
         }
 
-        this.currentOutput = this.currentOutput.slice(0, this.writePosition);
+        let finalMap = new Uint8Array(this.writePosition + 4);
+        finalMap[0] = 9;
+        finalMap.set(this.currentOutput.slice(0, this.writePosition), 4);
+
+        this.currentOutput = finalMap;
     }
 
     FlushCurrentChunk() {
