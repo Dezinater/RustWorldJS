@@ -16,27 +16,81 @@ export default class LZ4Writer {
     currentOutput: Uint8Array;
     readPosition: number;
     writePosition: number;
-    canRead: boolean;
+    canWrite: boolean;
     finalOutput: Uint8Array;
-    finalChunks: Array<number>[];
+    writeChunks: Array<Uint8Array>;
 
     constructor(bytes: ArrayBuffer) {
+        this.writeChunks = new Array(0);
         this.readPosition = 0;
         this.writePosition = 0;
-        this.canRead = true;
+        this.canWrite = true;
         this.bytes = bytes;
         this.currentOutput = new Uint8Array(new ArrayBuffer(this.bytes.byteLength));
+    }
 
-        while (this.canRead) {
-            this.FlushCurrentChunk();
-            console.log("Flushed " + this.readPosition + " " + this.writePosition + " " + this.bytes.byteLength);
-        }
+    workersFinished() {
+        let size = this.writeChunks.map(x => x.length).reduce((lastVal, currVal) => lastVal + currVal, 0);
+        let flatOutput = new Uint8Array(new ArrayBuffer(size));
 
-        let finalMap = new Uint8Array(this.writePosition + 4);
+        let finalWritePos = 0;
+        this.writeChunks.forEach((chunk) => {
+            flatOutput.set(chunk, finalWritePos);
+            finalWritePos += chunk.length;
+        });
+
+        let finalMap = new Uint8Array(flatOutput.length + 4);
         finalMap[0] = 9;
-        finalMap.set(this.currentOutput.slice(0, this.writePosition), 4);
+        finalMap.set(flatOutput, 4);
 
-        this.currentOutput = finalMap;
+        this.finalOutput = finalMap;
+        return this.finalOutput;
+    }
+
+    getOutput() {
+        return new Promise((resolve, reject) => {
+            if (!this.canWrite) {
+                resolve(this.finalOutput);
+                return;
+            }
+
+            let workersDone = 0;
+            let workersRequired = Math.ceil(this.bytes.byteLength / BLOCK_SIZE);
+            for (let i = 0; i < workersRequired; i++) {
+                let worker = new Worker(new URL('./worker.js', import.meta.url));
+
+                let size = Math.min(this.bytes.byteLength - (i * BLOCK_SIZE), BLOCK_SIZE);
+                worker.postMessage({
+                    index: i,
+                    bytes: this.bytes.slice(i * BLOCK_SIZE, (i * BLOCK_SIZE) + size) //since only the last one will be not block_size, i * BLOCK_SIZE is fine
+                });
+
+                worker.onmessage = (e) => {
+                    workersDone++;
+                    let { index, bytes } = e.data;
+                    this.writeChunks[index] = bytes;
+
+                    if (workersDone == workersRequired) {
+                        this.workersFinished();
+                        this.canWrite = false;
+                        resolve(this.finalOutput);
+                    }
+                };
+            }
+        });
+        /*
+                while (this.canRead) {
+                    this.FlushCurrentChunk();
+                    console.log("Flushed " + this.readPosition + " " + this.writePosition + " " + this.bytes.byteLength);
+                }
+        
+                let finalMap = new Uint8Array(this.writePosition + 4);
+                finalMap[0] = 9;
+                finalMap.set(this.currentOutput.slice(0, this.writePosition), 4);
+        
+                this.currentOutput = finalMap;
+                return this.currentOutput;
+                */
     }
 
     FlushCurrentChunk() {
@@ -68,24 +122,9 @@ export default class LZ4Writer {
         this.InnerStreamWrite(new Uint8Array(compressed), 0, compressedLength);
 
         if (this.readPosition >= this.bytes.byteLength) {
-            this.canRead = false;
+            this.canWrite = false;
         }
     }
-
-    makeBuffer(size: number) {
-        try {
-            return new Uint8Array(size);
-        } catch (error) {
-            var buf = new Array(size);
-
-            for (var i = 0; i < size; i++) {
-                buf[i] = 0;
-            }
-
-            return buf;
-        }
-    }
-
 
     WriteVarInt(value: number) {
         let bufferVal;
