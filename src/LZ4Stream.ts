@@ -1,6 +1,7 @@
 let lz4 = require("lz4js");
-import { WorldData } from "./proto/WorldData";
-const BLOCK_SIZE = 1024 * 1024;
+import { BLOCK_SIZE } from "./LZ4Helper";
+import { ChunkFlags } from "./LZ4Helper";
+import { memcpy } from "./LZ4Helper";
 
 export default class LZ4Stream {
     bytes: Uint8Array;
@@ -28,14 +29,8 @@ export default class LZ4Stream {
         while (!this.ended) {
             this.AquireNextChunk();
             this.finalChunks.push(this.currentOutput.slice(0, this._bufferLength));
-            //console.log(this.currentOutput.slice(0, this._bufferLength).length);
-            //console.log(this.finalOutput.length);
-            //let newOutput = this.finalOutput.concat(this.currentOutput.slice(0, this._bufferLength));
-            //this.finalOutput = newOutput;
-            //this.finalOutput = [...this.finalOutput, ...this.currentOutput.slice(0, this._bufferLength)];
         }
 
-        //might be faster this way instead of memcpy
         let size = this.finalChunks.map(x => x.length).reduce((lastVal, currVal) => lastVal + currVal, 0);
         this.finalOutput = new Uint8Array(new ArrayBuffer(size));
 
@@ -43,7 +38,31 @@ export default class LZ4Stream {
             this.finalOutput.set(chunk, index * BLOCK_SIZE);
         });
 
+        //this.downloadBlob(this.finalOutput,"binary", "application/octet-stream")
+
     }
+
+    downloadBlob (data:Uint8Array, fileName:string, mimeType:string) {
+        var blob, url:string;
+        blob = new Blob([data], {
+            type: mimeType
+        });
+        url = window.URL.createObjectURL(blob);
+        this.downloadURL(url, fileName);
+        setTimeout(function () {
+            return window.URL.revokeObjectURL(url);
+        }, 1000);
+    };
+
+    downloadURL (data:string, fileName:string) {
+        var a;
+        a = document.createElement('a');
+        a.href = data;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    };
 
     getOutput() {
         return this.finalOutput;
@@ -62,10 +81,12 @@ export default class LZ4Stream {
             if (varint == undefined) return false;
             let flags = varint as ChunkFlags;
             let isCompressed = (flags & ChunkFlags.Compressed) != 0;
+            //console.log(this.streamPosition, varint);
 
             let originalLength = this.ReadVarInt();
+            //console.log(this.streamPosition, originalLength);
             let compressedLength = isCompressed ? this.ReadVarInt() : originalLength;
-
+            //console.log(this.streamPosition, compressedLength, isCompressed);
             if (compressedLength > originalLength) throw "EndOfStream"; // corrupted
 
             let compressed = new Uint8Array(new ArrayBuffer(compressedLength));
@@ -73,8 +94,6 @@ export default class LZ4Stream {
 
             if (chunk != compressedLength) throw "EndOfStream"; // corrupted
 
-            //console.log(originalLength);
-            //console.log(compressed, chunk);
             if (!isCompressed) {
                 this._buffer = compressed; // no compression on this chunk
                 this._bufferLength = compressedLength;
@@ -87,19 +106,15 @@ export default class LZ4Stream {
                     throw 'NotSupportedException("Chunks with multiple passes are not supported.")';
                 }
 
-                //decode
-                //console.log(compressed, 0, compressedLength, this._buffer, 0, originalLength, true);
                 lz4.decompressBlock(compressed, this.currentOutput, 0, compressed.length, 0);
-                //console.log(testArray);
                 this._bufferLength = originalLength;
             }
 
             if (originalLength < BLOCK_SIZE) {
-                //console.log("end");
                 this.ended = true;
                 return;
             }
-            //console.log(this._bufferLength);
+
             this._bufferOffset = 0;
         } while (this._bufferLength == 0);
 
@@ -116,7 +131,6 @@ export default class LZ4Stream {
             buffer = this.dataview.getUint8(this.streamPosition)
             this.streamPosition++;
 
-            //console.log(buffer);
             if (buffer == 0) {
                 if (count == 0) return undefined;
                 console.error("throw exception?")
@@ -154,26 +168,9 @@ export default class LZ4Stream {
     }
 
     InnerStreamRead(output: Uint8Array, offset: number, length: number) {
-        output = this.memcpy(this.streamPosition, offset, length, this.bytes, output);
+        output = memcpy(this.streamPosition, offset, length, this.bytes, output);
         this.streamPosition += length;
         return length;
     }
 
-    memcpy(sourceIndex: number, destinationIndex: number, length: number, src: Uint8Array, dst: Uint8Array) {
-        if (destinationIndex + length > dst.byteLength) {
-            let newDst = new Uint8Array(new ArrayBuffer(destinationIndex + src.byteLength));
-            newDst.set(dst, 0);
-            dst = newDst;
-        }
-        dst.set(src.slice(sourceIndex, sourceIndex + length), 0);
-
-        return dst;
-    }
-}
-
-enum ChunkFlags {
-    None = 0x00,
-    Compressed = 0x01,
-    HighCompression = 0x02,
-    Passes = 0x04 | 0x08 | 0x10,
 }

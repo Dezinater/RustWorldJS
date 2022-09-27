@@ -12,49 +12,49 @@ export class VectorData extends Message<VectorData> {
 }
 
 export class PathData extends Message<PathData> {
-    @Field.d(1, "string", "required", "")
+    @Field.d(1, "string", "optional")
     public name: string;
 
-    @Field.d(2, "bool", "required", false)
+    @Field.d(2, "bool", "optional")
     public spline: boolean;
 
-    @Field.d(3, "bool", "required", false)
+    @Field.d(3, "bool", "optional")
     public start: boolean;
 
-    @Field.d(4, "bool", "required", false)
+    @Field.d(4, "bool", "optional")
     public end: boolean;
 
-    @Field.d(5, "float", "required", false)
+    @Field.d(5, "float", "optional")
     public width: number;
 
-    @Field.d(6, "float", "required", false)
+    @Field.d(6, "float", "optional")
     public innerPadding: number;
 
-    @Field.d(7, "float", "required", false)
+    @Field.d(7, "float", "optional")
     public outerPadding: number;
 
-    @Field.d(8, "float", "required", false)
+    @Field.d(8, "float", "optional")
     public innerFade: number;
 
-    @Field.d(9, "float", "required", false)
+    @Field.d(9, "float", "optional")
     public outerFade: number;
 
-    @Field.d(10, "float", "required", false)
+    @Field.d(10, "float", "optional")
     public randomScale: number;
 
-    @Field.d(11, "float", "required", false)
+    @Field.d(11, "float", "optional")
     public meshOffset: number;
 
-    @Field.d(12, "float", "required", false)
+    @Field.d(12, "float", "optional")
     public terrainOffset: number;
 
-    @Field.d(13, "int32", "required", false)
+    @Field.d(13, "int32", "optional")
     public splat: number;
 
-    @Field.d(14, "int32", "required", false)
+    @Field.d(14, "int32", "optional")
     public topology: number;
 
-    @Field.d(15, VectorData)
+    @Field.d(15, VectorData, "repeated")
     public nodes: VectorData[];
 }
 

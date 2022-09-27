@@ -8,6 +8,7 @@
 import { Options, Vue } from 'vue-class-component';
 import HelloWorld from './components/HelloWorld.vue';
 import LZ4Stream from './LZ4Stream';
+import LZ4Writer from './LZ4Writer';
 import { VectorData, WorldData } from './proto/WorldData';
 import TerrainMap from './rust/TerrainMap';
 
@@ -17,6 +18,29 @@ import TerrainMap from './rust/TerrainMap';
   },
 })
 export default class App extends Vue {
+
+  downloadBlob(data: Uint8Array, fileName: string, mimeType: string) {
+    let blob, url:any;
+    blob = new Blob([data], {
+      type: mimeType
+    });
+    url = window.URL.createObjectURL(blob);
+    this.downloadURL(url, fileName);
+    setTimeout(function () {
+      return window.URL.revokeObjectURL(url);
+    }, 1000);
+  };
+
+  downloadURL(data: any, fileName: string) {
+    var a;
+    a = document.createElement('a');
+    a.href = data;
+    a.download = fileName;
+    document.body.appendChild(a);
+    //a.style = 'display: none';
+    a.click();
+    a.remove();
+  };
 
   convertToImageData(ctx: any, data: any, res: number, color = [150, 150, 150], transparent = true) {
     let imageData = ctx?.createImageData(res, res) as ImageData;
@@ -48,10 +72,22 @@ export default class App extends Vue {
 
     let stream = new LZ4Stream(rawBytes);
     let decoded = WorldData.decode(stream.getOutput());
+    let encoded = WorldData.encode(decoded).finish();
+
+    console.log(decoded);
     canvas.width = decoded.size;
     canvas.height = decoded.size;
-    console.log(decoded);
 
+/*
+    let writer = new LZ4Writer(encoded);
+    let finalMap = new Uint8Array(writer.currentOutput.length + 4);
+    console.log(finalMap);
+    finalMap[0] = 9;
+    console.log(finalMap);
+    finalMap.set(writer.currentOutput, 4);
+    console.log(finalMap);
+    this.downloadBlob(finalMap, "testMap.map", "application/octet-stream");
+*/
     /*
     const countedNames = decoded.prefabs.reduce((allNames: { [key: string]: number }, name) => {
       const currCount = allNames[name.category] ?? 0;
