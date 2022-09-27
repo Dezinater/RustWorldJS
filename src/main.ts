@@ -1,7 +1,7 @@
 //import { createApp } from 'vue'
 //import App from './App.vue'
 import LZ4Stream from './LZ4Reader';
-import { WorldData } from './proto/WorldData';
+import { WorldData } from './rust/WorldData';
 import TerrainMap from './rust/TerrainMap';
 //var Buffer = require('buffer').Buffer
 //var lz4 = require('lz4')

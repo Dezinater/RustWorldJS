@@ -1,5 +1,5 @@
 import LZ4Reader from './LZ4Reader';
-import { WorldData } from './proto/WorldData';
+import { WorldData } from './rust/WorldData';
 import TerrainMap from './rust/TerrainMap';
 import LZ4Writer from './LZ4Writer';
 
@@ -14,7 +14,10 @@ import LZ4Writer from './LZ4Writer';
 
     let encoded = WorldData.encode(decoded).finish();
     let writer = new LZ4Writer(encoded);
-    downloadBlob(writer.currentOutput, "testMap.map", "application/octet-stream");
+    writer.getOutput().then(x => {
+        console.log(x);
+    });
+    //downloadBlob(writer.currentOutput, "testMap.map", "application/octet-stream");
 })();
 
 function downloadBlob(data: Uint8Array, fileName: string, mimeType: string) {
@@ -63,6 +66,9 @@ async function drawMap(decoded: WorldData) {
         console.error("CTX null");
         return;
     }
+
+    canvas.width = decoded.size;
+    canvas.height = decoded.size;
     /*
         let finalMap = new Uint8Array(writer.currentOutput.length + 4);
         finalMap[0] = 9;
