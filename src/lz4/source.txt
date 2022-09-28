@@ -1,0 +1,3 @@
+Original Source: https://github.com/Benzinga/lz4js#readme
+
+I just modified the hashing method and a bit of the compressBlock function
