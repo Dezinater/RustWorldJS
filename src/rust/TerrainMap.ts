@@ -6,7 +6,6 @@ export default class TerrainMap {
 
     constructor(data: Uint8Array, channels: number, type: string | "int" | "short" | "byte") {
         this.channels = channels;
-        //let dataview = new DataView(data.buffer);
         switch (type) {
             case "int": this.dst = new Uint32Array(data.buffer, data.byteOffset, data.byteLength / Uint32Array.BYTES_PER_ELEMENT); break;
             case "short": this.dst = new Uint16Array(data.buffer, data.byteOffset, data.byteLength / Uint16Array.BYTES_PER_ELEMENT); break;
@@ -15,31 +14,14 @@ export default class TerrainMap {
         this.type = type;
         let byteSize = this.BytesPerElement();
         this.res = Math.ceil(Math.sqrt(data.length / byteSize / channels));
-
-        /*
-        for (let i = 0; i < this.res; i++) {
-            for (let j = 0; j < this.res; j++) {
-                let val = 0;
-                /*
-                switch (type) {
-                    case "int": val = dataview.getUint32(((i * this.res) + j) * byteSize); break;
-                    case "short": val = dataview.getUint16(((i * this.res) + j) * byteSize); break;
-                    case "byte": val = dataview.getUint8(((i * this.res) + j) * byteSize); break;
-                }
-
-                currentDst.push(val);
-            }
-            this.dst.push(currentDst);
-            currentDst = [];
-        }
-        */
-        //console.log(data);
-        //console.log(this.dst.length);
-        //src = dst = new T[channels * res * res];
     }
 
     get(x = 0, y = 0, channel = 0) {
-        return this.dst[((x * this.res) + y) + (channel * this.res * this.res)];
+        return this.dst[(x + (this.res - y) * this.res) + (channel * this.res * this.res)];
+    }
+
+    set(value: number, x = 0, y = 0, channel = 0) {
+        this.dst[(x + (this.res - y) * this.res) + (channel * this.res * this.res)] = value;
     }
 
     getChannel(channel: number) {

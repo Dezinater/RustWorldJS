@@ -3,6 +3,8 @@ import { WorldData } from './rust/WorldData';
 import TerrainMap from './rust/TerrainMap';
 import LZ4Writer from './LZ4Writer';
 
+export { TerrainMap };
+
 export function readMap(bytes: ArrayBuffer) {
     let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
 
@@ -21,11 +23,20 @@ export function writeMap(bytes: WorldData) {
     let decoded = readMap(buffer);
     console.log(decoded);
 
-    drawMap(decoded);
+    let splatData = decoded.maps.find(x => x.name == "splat");
+    let splatMap = new TerrainMap(splatData.data, 8, "byte");
+    let center = splatMap.res / 2; //x and y are same since maps are always square
 
-    writeMap(decoded).then(x => {
-        console.log(x);
-    });
+    //floodFill(splatMap, center - 100, center + 100, center - 100, center + 100, 0, 1);
+    floodFill(splatMap, center - 100, center + 100, center - 100, center + 500, 255, 2);
+    fillCircle(splatMap, center, 420, 255, 1);
+
+    drawMap(decoded);
+    /*
+        writeMap(decoded).then(x => {
+            console.log(x);
+        });
+        */
     //downloadBlob(writer.currentOutput, "testMap.map", "application/octet-stream");
 })();
 
@@ -66,6 +77,24 @@ function convertToImageData(ctx: any, data: any, res: number, color = [150, 150,
         }
     }
     return imageData;
+}
+
+function floodFill(splatMap: TerrainMap, startX: number, endX: number, startY: number, endY: number, value: number, channel: number = 0) {
+    for (let x = startX; x < endX; x++) {
+        for (let y = startY; y < endY; y++) {
+            splatMap.set(value, x, y, channel);
+        }
+    }
+}
+
+function fillCircle(splatMap: TerrainMap, center: number, radius: number, value: number, channel: number = 0) {
+    for (let x = 0; x < splatMap.res; x++) {
+        for (let y = 0; y < splatMap.res; y++) {
+            if (Math.sqrt((x - center) ** 2 + (y - center) ** 2) > radius) {
+                splatMap.set(value, x, y, channel);
+            }
+        }
+    }
 }
 
 async function drawMap(decoded: WorldData) {
