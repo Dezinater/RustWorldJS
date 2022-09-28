@@ -3,18 +3,27 @@ import { WorldData } from './rust/WorldData';
 import TerrainMap from './rust/TerrainMap';
 import LZ4Writer from './LZ4Writer';
 
-(async () => {
-    let buffer = await (await fetch("./SancMapNoPrefabs.map")).arrayBuffer();
-    let rawBytes = new Uint8Array(buffer).slice(4, buffer.byteLength);
+export function readMap(bytes: ArrayBuffer) {
+    let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
 
     let stream = new LZ4Reader(rawBytes);
-    let decoded = WorldData.decode(stream.getOutput());
+    return WorldData.decode(stream.getOutput());
+}
+
+export function writeMap(bytes: WorldData) {
+    let encoded = WorldData.encode(bytes).finish();
+    let writer = new LZ4Writer(encoded);
+    return writer.getOutput();
+}
+
+(async () => {
+    let buffer = await (await fetch("./SancMapNoPrefabs.map")).arrayBuffer();
+    let decoded = readMap(buffer);
     console.log(decoded);
+
     drawMap(decoded);
 
-    let encoded = WorldData.encode(decoded).finish();
-    let writer = new LZ4Writer(encoded);
-    writer.getOutput().then(x => {
+    writeMap(decoded).then(x => {
         console.log(x);
     });
     //downloadBlob(writer.currentOutput, "testMap.map", "application/octet-stream");
