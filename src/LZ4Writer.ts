@@ -1,27 +1,16 @@
-let lz4 = require("./lz4/lz4.js");
-//import { Worker } from 'worker_threads';
-
 const WORKERS_AMOUNT = 8;
-//new Worker(new URL('./worker.js'));
-//let lz4 = require("lz4js");
 import { BLOCK_SIZE } from "./LZ4Helper";
-import { ChunkFlags } from "./LZ4Helper";
-import { memcpy } from "./LZ4Helper";
 
 export default class LZ4Writer {
     bytes: ArrayBuffer;
-    dataview: DataView;
-    _bufferOffset: number;
-    _buffer: Uint8Array;
-    _bufferLength: number;
     currentOutput: Uint8Array;
-    workersStarted: number;
-    workersDone: number;
     readPosition: number;
     writePosition: number;
     canWrite: boolean;
     finalOutput: Uint8Array;
     writeChunks: Array<Uint8Array>;
+    workersStarted: number;
+    workersDone: number;
     workers: Array<Worker>;
 
     constructor(bytes: ArrayBuffer) {
@@ -55,16 +44,16 @@ export default class LZ4Writer {
         finalMap.set(flatOutput, 4);
 
         this.finalOutput = finalMap;
+        this.writeChunks = new Array(0);
         return this.finalOutput;
     }
 
     getOutput() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (!this.canWrite) {
                 resolve(this.finalOutput);
                 return;
             }
-
 
             let workersRequired = Math.ceil(this.bytes.byteLength / BLOCK_SIZE);
 

@@ -1,6 +1,5 @@
 let lz4 = require("./lz4/lz4.js");
-import { BLOCK_SIZE } from "./LZ4Helper";
-import { ChunkFlags } from "./LZ4Helper";
+import { BLOCK_SIZE, ChunkFlags } from "./LZ4Helper";
 
 let writePosition = 0;
 let currentOutput = new Array(0);

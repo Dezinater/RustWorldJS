@@ -7,12 +7,7 @@
     "build": "webpack --mode=production"
   },
   "dependencies": {
-    "core-js": "^3.8.3",
-    "fs": "^0.0.1-security",
-    "lz4": "^0.6.5",
-    "lz4-napi": "^2.0.3",
     "lz4js": "^0.2.0",
-    "path": "^0.12.7",
     "protobufjs": "^7.1.1"
   },
   "devDependencies": {

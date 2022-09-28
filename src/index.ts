@@ -69,11 +69,6 @@ async function drawMap(decoded: WorldData) {
 
     canvas.width = decoded.size;
     canvas.height = decoded.size;
-    /*
-        let finalMap = new Uint8Array(writer.currentOutput.length + 4);
-        finalMap[0] = 9;
-        finalMap.set(writer.currentOutput, 4);
-    */
 
     let terrainData = decoded.maps.find(x => x.name == "terrain");
     let heightData = decoded.maps.find(x => x.name == "terrain");
@@ -115,7 +110,6 @@ async function drawMap(decoded: WorldData) {
     ];
 
     for (let i = 7; i >= 0; i--) {
-        //for (let i = 0; i < 8; i++) {
         currentData = currentMap.getChannel(i);
         imageData = await createImageBitmap(convertToImageData(ctx, currentData, currentMap.res, splatTypes[i]));
         ctx.drawImage(imageData, 0, 0, canvas.width, canvas.height);
@@ -137,20 +131,4 @@ async function drawMap(decoded: WorldData) {
 
     ctx.fillStyle = "#ff0000";
     let count: { [key: string]: number } = {};
-
-    decoded.prefabs.forEach(x => {
-        if (x.category == "Monument") {
-            if (!(x.id in count)) {
-                count[x.id] = 0;
-            }
-            count[x.id]++;
-
-            let xPos = decoded.size / 2 + x.position.x
-            let yPos = decoded.size / 2 + x.position.z
-
-            ctx?.beginPath();
-            ctx?.arc(xPos, yPos, 35, 0, 2 * Math.PI);
-            ctx?.fill();
-        }
-    });
 }

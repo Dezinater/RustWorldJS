@@ -1,4 +1,4 @@
-let lz4 = require("lz4js");
+const lz4 = require("./lz4/lz4.js");
 import { BLOCK_SIZE } from "./LZ4Helper";
 import { ChunkFlags } from "./LZ4Helper";
 import { memcpy } from "./LZ4Helper";
@@ -6,7 +6,6 @@ import { memcpy } from "./LZ4Helper";
 export default class LZ4Reader {
     bytes: Uint8Array;
     dataview: DataView;
-    _bufferOffset: number;
     _buffer: Uint8Array;
     _bufferLength: number;
     currentOutput: number[];
@@ -18,7 +17,6 @@ export default class LZ4Reader {
     constructor(bytes: Uint8Array) {
         this.bytes = bytes;
         this.dataview = new DataView(bytes.buffer);
-        this._bufferOffset = 0;
         this._buffer = new Uint8Array(new ArrayBuffer(0));
         this._bufferLength = 0;
         this.streamPosition = 0;
@@ -37,32 +35,7 @@ export default class LZ4Reader {
         this.finalChunks.forEach((chunk, index) => {
             this.finalOutput.set(chunk, index * BLOCK_SIZE);
         });
-
-        //this.downloadBlob(this.finalOutput,"binary", "application/octet-stream")
-
     }
-
-    downloadBlob (data:Uint8Array, fileName:string, mimeType:string) {
-        var blob, url:string;
-        blob = new Blob([data], {
-            type: mimeType
-        });
-        url = window.URL.createObjectURL(blob);
-        this.downloadURL(url, fileName);
-        setTimeout(function () {
-            return window.URL.revokeObjectURL(url);
-        }, 1000);
-    };
-
-    downloadURL (data:string, fileName:string) {
-        var a;
-        a = document.createElement('a');
-        a.href = data;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    };
 
     getOutput() {
         return this.finalOutput;
@@ -81,12 +54,9 @@ export default class LZ4Reader {
             if (varint == undefined) return false;
             let flags = varint as ChunkFlags;
             let isCompressed = (flags & ChunkFlags.Compressed) != 0;
-            //console.log(this.streamPosition, varint);
 
             let originalLength = this.ReadVarInt();
-            //console.log(this.streamPosition, originalLength);
             let compressedLength = isCompressed ? this.ReadVarInt() : originalLength;
-            //console.log(this.streamPosition, compressedLength, isCompressed);
             if (compressedLength > originalLength) throw "EndOfStream"; // corrupted
 
             let compressed = new Uint8Array(new ArrayBuffer(compressedLength));
@@ -115,7 +85,6 @@ export default class LZ4Reader {
                 return;
             }
 
-            this._bufferOffset = 0;
         } while (this._bufferLength == 0);
 
         return true;
