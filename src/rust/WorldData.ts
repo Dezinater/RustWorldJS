@@ -1,7 +1,8 @@
 import { Message, Type, Field, OneOf } from "protobufjs/light"; // respectively "./node_modules/protobufjs/light.js"
 import TerrainMap from "./TerrainMap";
+import TextMap from "./TextMap";
 
-const TERRAIN_MAPS  = {
+const TERRAIN_MAPS = {
     "terrain": {
         dataType: "short",
         channels: 1
@@ -112,24 +113,48 @@ export class MapData extends Message<MapData> {
 }
 
 export class WorldData extends Message<WorldData> {
-    getTerrainMap(mapName: string, channels: number = undefined, dataType: string | "byte" | "short" | "int" = undefined): TerrainMap {
+    getTerrainMap(map: string | number, channels: number = undefined, dataType: string | "byte" | "short" | "int" = undefined): TerrainMap {
         if (this.maps == undefined) {
             return undefined;
         }
 
-        let mapData = this.maps.find(x => x.name == mapName);
-        let map;
-        
+        let mapData;
+        let terrainMap;
+
+        if (typeof map == "number") {
+            mapData = this.maps[map as number]
+        } else if (typeof map == "string") {
+            mapData = this.maps.find(x => x.name == map);
+        }
+
         if (channels != undefined && dataType != undefined) {
-            map = new TerrainMap(mapData.data, channels, dataType);
+            terrainMap = new TerrainMap(mapData.data, channels, dataType);
         } else {
-            if (mapName in TERRAIN_MAPS) {
-                let mapInfo = TERRAIN_MAPS[mapName as keyof typeof TERRAIN_MAPS];
-                map = new TerrainMap(mapData.data, mapInfo.channels, mapInfo.dataType);
+            if (map in TERRAIN_MAPS) {
+                let mapInfo = TERRAIN_MAPS[map as keyof typeof TERRAIN_MAPS];
+                terrainMap = new TerrainMap(mapData.data, mapInfo.channels, mapInfo.dataType);
             }
         }
 
-        return map;
+        return terrainMap;
+    }
+
+    getTextMap(map: string | number) {
+        if (this.maps == undefined) {
+            return undefined;
+        }
+
+        let mapData: MapData;
+
+        if (typeof map == "number") {
+            mapData = this.maps[map as number]
+        } else if (typeof map == "string") {
+            mapData = this.maps.find(x => x.name == map);
+        }
+
+        if (mapData != undefined) {
+            return new TextMap(mapData.data);
+        }
     }
 
     @Field.d(1, "uint32", "required", 2000)

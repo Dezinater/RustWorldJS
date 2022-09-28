@@ -3,7 +3,7 @@ import { WorldData } from './rust/WorldData';
 import TerrainMap from './rust/TerrainMap';
 import LZ4Writer from './LZ4Writer';
 
-export { TerrainMap };
+export { WorldData, TerrainMap };
 
 export function readMap(bytes: ArrayBuffer) {
     let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
@@ -20,6 +20,11 @@ export function writeMap(bytes: WorldData) {
 (async () => {
     let buffer = await (await fetch("./SancMapNoPrefabs.map")).arrayBuffer();
     let decoded = readMap(buffer);
+
+    let textMap = decoded.getTextMap(1);
+
+    
+    console.log(textMap.dst);
     console.log(decoded);
 
     let splatData = decoded.maps.find(x => x.name == "splat");
