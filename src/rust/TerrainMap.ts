@@ -6,10 +6,15 @@ export default class TerrainMap {
 
     constructor(data: Uint8Array, channels: number, type: string | "int" | "short" | "byte") {
         this.channels = channels;
+        let offset = data.byteOffset;
+        if(offset % 2 != 0) { //for some reason the heightmap offset isnt a multiple of 2
+            offset++;
+        }
+        
         switch (type) {
-            case "int": this.dst = new Uint32Array(data.buffer, data.byteOffset, data.byteLength / Uint32Array.BYTES_PER_ELEMENT); break;
-            case "short": this.dst = new Uint16Array(data.buffer, data.byteOffset, data.byteLength / Uint16Array.BYTES_PER_ELEMENT); break;
-            case "byte": this.dst = new Uint8Array(data.buffer, data.byteOffset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT); break;
+            case "int": this.dst = new Uint32Array(data.buffer, offset, data.byteLength / Uint32Array.BYTES_PER_ELEMENT); break;
+            case "short": this.dst = new Uint16Array(data.buffer, offset, data.byteLength / Uint16Array.BYTES_PER_ELEMENT); break;
+            case "byte": this.dst = new Uint8Array(data.buffer, offset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT); break;
         }
         this.type = type;
         let byteSize = this.BytesPerElement();
