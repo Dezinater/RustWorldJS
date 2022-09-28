@@ -1,4 +1,36 @@
 import { Message, Type, Field, OneOf } from "protobufjs/light"; // respectively "./node_modules/protobufjs/light.js"
+import TerrainMap from "./TerrainMap";
+
+const TERRAIN_MAPS  = {
+    "terrain": {
+        dataType: "short",
+        channels: 1
+    },
+    "height": {
+        dataType: "short",
+        channels: 1
+    },
+    "water": {
+        dataType: "short",
+        channels: 1
+    },
+    "splat": {
+        dataType: "byte",
+        channels: 8
+    },
+    "topology": {
+        dataType: "int",
+        channels: 1
+    },
+    "biome": {
+        dataType: "short",
+        channels: 4
+    },
+    "alpha": {
+        dataType: "byte",
+        channels: 1
+    },
+};
 
 export class VectorData extends Message<VectorData> {
     @Field.d(1, "float", "required", 0)
@@ -80,6 +112,26 @@ export class MapData extends Message<MapData> {
 }
 
 export class WorldData extends Message<WorldData> {
+    getTerrainMap(mapName: string, channels: number = undefined, dataType: string | "byte" | "short" | "int" = undefined): TerrainMap {
+        if (this.maps == undefined) {
+            return undefined;
+        }
+
+        let mapData = this.maps.find(x => x.name == mapName);
+        let map;
+        
+        if (channels != undefined && dataType != undefined) {
+            map = new TerrainMap(mapData.data, channels, dataType);
+        } else {
+            if (mapName in TERRAIN_MAPS) {
+                let mapInfo = TERRAIN_MAPS[mapName as keyof typeof TERRAIN_MAPS];
+                map = new TerrainMap(mapData.data, mapInfo.channels, mapInfo.dataType);
+            }
+        }
+
+        return map;
+    }
+
     @Field.d(1, "uint32", "required", 2000)
     public size: number;
 

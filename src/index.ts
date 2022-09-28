@@ -7,7 +7,6 @@ export { TerrainMap };
 
 export function readMap(bytes: ArrayBuffer) {
     let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
-
     let stream = new LZ4Reader(rawBytes);
     return WorldData.decode(stream.getOutput());
 }
@@ -65,6 +64,7 @@ function downloadURL(data: any, fileName: string) {
 
 
 function convertToImageData(ctx: any, data: any, res: number, color = [150, 150, 150], transparent = true) {
+    //basically just lays it out in a flat format. the alpha is the value of the map, colours is as defined in the splatTypes array
     let imageData = ctx?.createImageData(res, res) as ImageData;
     for (let i = 0; i < data.length; i++) {
         imageData.data[(i * 4)] = color[0] //* (1 / 255);
@@ -105,37 +105,25 @@ async function drawMap(decoded: WorldData) {
         return;
     }
 
+    //match the image size to the map size
     canvas.width = decoded.size;
     canvas.height = decoded.size;
 
-    let terrainData = decoded.maps.find(x => x.name == "terrain");
-    let heightData = decoded.maps.find(x => x.name == "terrain");
-    let splatData = decoded.maps.find(x => x.name == "splat");
-    let biomeData = decoded.maps.find(x => x.name == "biome");
-    let waterData = decoded.maps.find(x => x.name == "water");
-    if (terrainData == undefined || splatData == undefined || biomeData == undefined || waterData == undefined || heightData == undefined) {
-        console.error("Missing map data");
-        return;
-    }
+    let heightMap = decoded.getTerrainMap("terrain"); //terrain is a better heightmap than 'height'
+    let splatMap = decoded.getTerrainMap("splat");
 
-    let terrainMap = new TerrainMap(terrainData.data, 1, "short");
-    let heightMap = new TerrainMap(heightData.data, 1, "short");
-    let splatMap = new TerrainMap(splatData.data, 8, "byte");
-    let biomeMap = new TerrainMap(biomeData.data, 4, "byte");
-    let waterMap = new TerrainMap(waterData.data, 1, "short");
-
+    //change coordinate system to match rust
     ctx.translate(0, canvas.height);
     ctx.scale(1, -1);
+
+    //draw background water
     ctx.beginPath();
     ctx.rect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#12404d";
     ctx.fill();
 
-    let currentMap = splatMap;
-    let currentData = currentMap.getChannel(7); //gravel
+    //define splat colours
     let imageData;
-
-    currentMap = splatMap;
     let splatTypes = [
         [115, 118, 83], //dirt
         [255, 250, 250], //snow
@@ -147,12 +135,13 @@ async function drawMap(decoded: WorldData) {
         [75, 58, 43], //gravel
     ];
 
+    //draw splats
     for (let i = 7; i >= 0; i--) {
-        currentData = currentMap.getChannel(i);
-        imageData = await createImageBitmap(convertToImageData(ctx, currentData, currentMap.res, splatTypes[i]));
+        imageData = await createImageBitmap(convertToImageData(ctx, splatMap.getChannel(i), splatMap.res, splatTypes[i]));
         ctx.drawImage(imageData, 0, 0, canvas.width, canvas.height);
     }
 
+    //draw coastal waters
     let filteredTerrain = heightMap.dst.map(x => x *= 1 / 255).map(x => {
         if (x > 60 && x <= 63) {
             return 235 - (25 * (x - 60));
@@ -163,10 +152,7 @@ async function drawMap(decoded: WorldData) {
 
         return 255;
     });
+
     imageData = await createImageBitmap(convertToImageData(ctx, filteredTerrain, heightMap.res, [18, 64, 77], true));
     ctx.drawImage(imageData, 0, 0, canvas.width, canvas.height);
-
-
-    ctx.fillStyle = "#ff0000";
-    let count: { [key: string]: number } = {};
 }
