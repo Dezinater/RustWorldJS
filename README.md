@@ -1,4 +1,4 @@
-# rust-web-map
+# RustWorldJS
 
 ## Project setup
 ```
