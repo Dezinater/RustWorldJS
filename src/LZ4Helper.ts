@@ -9,7 +9,7 @@ export enum ChunkFlags {
 
 export function memcpy(sourceIndex: number, destinationIndex: number, length: number, src: Uint8Array, dst: Uint8Array) {
     if (destinationIndex + length > dst.byteLength) {
-        let newDst = new Uint8Array(new ArrayBuffer(destinationIndex + src.byteLength));
+        const newDst = new Uint8Array(new ArrayBuffer(destinationIndex + src.byteLength));
         newDst.set(dst, 0);
         dst = newDst;
     }

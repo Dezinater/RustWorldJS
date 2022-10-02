@@ -1,9 +1,10 @@
 import LZ4Reader from './LZ4Reader';
 import { WorldData } from './rust/WorldData';
 import TerrainMap from './rust/TerrainMap';
+import TextMap from './rust/TextMap';
 import LZ4Writer from './LZ4Writer';
 
-export { WorldData, TerrainMap };
+export { WorldData, TerrainMap, TextMap };
 
 export function readMap(bytes: ArrayBuffer) {
     let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
@@ -16,15 +17,15 @@ export function writeMap(bytes: WorldData) {
     let writer = new LZ4Writer(encoded);
     return writer.getOutput();
 }
-
+/*
 (async () => {
-    let buffer = await (await fetch("./SancMapNoPrefabs.map")).arrayBuffer();
+    let buffer = await (await fetch("./procedural_4250_60623841-c715-40f9-b0ab-d970a0d60ad1.map")).arrayBuffer();
+    console.log(buffer)
     let decoded = readMap(buffer);
-
-    let textMap = decoded.getTextMap(1);
+    //let textMap = decoded.getTextMap(1);
 
     
-    console.log(textMap.dst);
+    //console.log(textMap.dst);
     console.log(decoded);
 
     let splatData = decoded.maps.find(x => x.name == "splat");
@@ -32,18 +33,18 @@ export function writeMap(bytes: WorldData) {
     let center = splatMap.res / 2; //x and y are same since maps are always square
 
     //floodFill(splatMap, center - 100, center + 100, center - 100, center + 100, 0, 1);
-    floodFill(splatMap, center - 100, center + 100, center - 100, center + 500, 255, 2);
-    fillCircle(splatMap, center, 420, 255, 1);
+    //floodFill(splatMap, center - 100, center + 100, center - 100, center + 500, 255, 2);
+    //fillCircle(splatMap, center, 420, 255, 1);
 
     drawMap(decoded);
     /*
         writeMap(decoded).then(x => {
             console.log(x);
         });
-        */
+        
     //downloadBlob(writer.currentOutput, "testMap.map", "application/octet-stream");
 })();
-
+*/
 function downloadBlob(data: Uint8Array, fileName: string, mimeType: string) {
     let blob, url: any;
     blob = new Blob([data], {

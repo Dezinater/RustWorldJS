@@ -7,10 +7,15 @@ export default class TerrainMap {
     constructor(data: Uint8Array, channels: number, type: string | "int" | "short" | "byte") {
         this.channels = channels;
         let offset = data.byteOffset;
-        if(offset % 2 != 0) { //for some reason the heightmap offset isnt a multiple of 2
+
+        //not sure why the data isnt aligned but aligning it like this fixes it
+        if (type == "int" && offset % 4 != 0) {
+            offset += 4 - (offset % 4);
+        }
+        if (type == "short" && offset % 2 != 0) {
             offset++;
         }
-        
+
         switch (type) {
             case "int": this.dst = new Uint32Array(data.buffer, offset, data.byteLength / Uint32Array.BYTES_PER_ELEMENT); break;
             case "short": this.dst = new Uint16Array(data.buffer, offset, data.byteLength / Uint16Array.BYTES_PER_ELEMENT); break;

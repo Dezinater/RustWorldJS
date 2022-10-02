@@ -34,13 +34,13 @@ const TERRAIN_MAPS = {
 };
 
 export class VectorData extends Message<VectorData> {
-    @Field.d(1, "float", "required", 0)
+    @Field.d(1, "float")
     public x: number;
 
-    @Field.d(2, "float", "required", 0)
+    @Field.d(2, "float")
     public y: number;
 
-    @Field.d(3, "float", "required", 0)
+    @Field.d(3, "float")
     public z: number;
 }
 
@@ -92,10 +92,10 @@ export class PathData extends Message<PathData> {
 }
 
 export class PrefabData extends Message<PrefabData>  {
-    @Field.d(1, "string", "required", "")
+    @Field.d(1, "string")
     public category: string;
 
-    @Field.d(2, "uint32", "required", 0)
+    @Field.d(2, "uint32")
     public id: number;
 
     @Field.d(3, VectorData)
@@ -118,8 +118,8 @@ export class WorldData extends Message<WorldData> {
             return undefined;
         }
 
-        let mapData;
-        let terrainMap;
+        let mapData: MapData;
+        let terrainMap: TerrainMap;
 
         if (typeof map == "number") {
             mapData = this.maps[map as number]
