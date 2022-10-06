@@ -34,8 +34,8 @@ function main() {
     newWorld.addMap("biome", biomeMap);
     newWorld.addMap("alpha", alphaMap);
 
-    rustWorld.writeMap(newWorld).then(x => {
-        fs.writeFile('circle-plots.map', x, "binary", function (err) {
+    rustWorld.writeMap(newWorld).then(bytes => {
+        fs.writeFile('circle-plots.map', bytes, "binary", function (err) {
             if (err) return console.log(err);
             console.log("Finished generating map!")
         });
