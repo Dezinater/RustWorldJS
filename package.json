@@ -15,7 +15,8 @@
     "test": "./test"
   },
   "dependencies": {
-    "protobufjs": "^7.1.1"
+    "protobufjs": "^7.1.1",
+    "web-worker": "^1.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",

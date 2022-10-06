@@ -1,10 +1,12 @@
 {
     "compilerOptions": {
         "target": "esnext",
-        "module": "commonjs",
+        "module": "esnext",
         "outDir": "./dist",
         "rootDir": "../",
-        "noEmit": true
+        "noEmit": false,
+        "moduleResolution":"node",
+        "experimentalDecorators": true
     },
     "include": [
         "src/**/*",
