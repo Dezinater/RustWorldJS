@@ -19,17 +19,23 @@ export function writeMap(bytes: WorldData) {
 }
 /*
 (async () => {
-    let buffer = await (await fetch("./procedural_4250_60623841-c715-40f9-b0ab-d970a0d60ad1.map")).arrayBuffer();
+    let buffer = await (await fetch("./testMap.map")).arrayBuffer();
     console.log(buffer)
     let decoded = readMap(buffer);
     //let textMap = decoded.getTextMap(1);
+    console.log(decoded.getTerrainMap("height").res);
+    console.log(decoded.getTerrainMap("water").res);
+    console.log(decoded.getTerrainMap("splat").res);
+    console.log(decoded.getTerrainMap("topology").res);
+    console.log(decoded.getTerrainMap("biome").res);
+    console.log(decoded.getTerrainMap("alpha").res);
 
-    
     //console.log(textMap.dst);
     console.log(decoded);
 
-    let splatData = decoded.maps.find(x => x.name == "splat");
-    let splatMap = new TerrainMap(splatData.data, 8, "byte");
+    //let splatData = decoded.maps.find(x => x.name == "splat");
+    //let splatMap = new TerrainMap(splatData.data, 8, "byte");
+    let splatMap = decoded.getTerrainMap("splat");
     let center = splatMap.res / 2; //x and y are same since maps are always square
 
     //floodFill(splatMap, center - 100, center + 100, center - 100, center + 100, 0, 1);
@@ -37,15 +43,68 @@ export function writeMap(bytes: WorldData) {
     //fillCircle(splatMap, center, 420, 255, 1);
 
     drawMap(decoded);
-    /*
-        writeMap(decoded).then(x => {
-            console.log(x);
-        });
-        
+
+    writeMap(decoded).then(x => {
+        console.log(x);
+        //downloadBlob(x, "testMap.map", "application/octet-stream");
+    });
+
     //downloadBlob(writer.currentOutput, "testMap.map", "application/octet-stream");
 })();
 */
-function downloadBlob(data: Uint8Array, fileName: string, mimeType: string) {
+
+//main();
+
+function main() {
+
+    const WORLD_SIZE = 2000;
+    const RADIUS = 50;
+    const SPACING = 42;
+
+    let newWorld = new WorldData(WORLD_SIZE);
+    let terrainMap = newWorld.createEmptyTerrainMap("terrain", 1025);
+    let heightMap = newWorld.createEmptyTerrainMap("height", 1025);
+    let waterMap = newWorld.createEmptyTerrainMap("water", 1025);
+    let splatMap = newWorld.createEmptyTerrainMap("splat", 1024);
+    let topologyMap = newWorld.createEmptyTerrainMap("topology", 1024);
+    let biomeMap = newWorld.createEmptyTerrainMap("biome", 725);
+    let alphaMap = newWorld.createEmptyTerrainMap("alpha", 1024);
+
+    let plotSize = 2 * RADIUS + SPACING;
+    let plotsAmount = Math.floor(WORLD_SIZE / plotSize);
+
+    for (let i = 0; i < plotsAmount; i++) {
+        for (let j = 0; j < plotsAmount; j++) {
+            floodFillCircle(terrainMap, RADIUS, i * plotSize, j * plotSize);
+            floodFillCircle(splatMap, RADIUS, i * plotSize, j * plotSize, 1);
+        }
+    }
+
+    newWorld.addMap("terrain", terrainMap);
+    newWorld.addMap("height", heightMap);
+    newWorld.addMap("water", waterMap);
+    newWorld.addMap("splat", splatMap);
+    newWorld.addMap("topology", topologyMap);
+    newWorld.addMap("biome", biomeMap);
+    newWorld.addMap("alpha", alphaMap);
+
+    drawMap(newWorld);
+}
+
+function floodFillCircle(map, radius, startX, startY, channel = 0) {
+    let centerX = startX + radius;
+    let centerY = startY + radius;
+
+    for (let x = startX; x < startX + (radius * 2); x++) {
+        for (let y = startY; y < startY + (radius * 2); y++) {
+            if (Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2) < radius) {
+                map.setNormalized(0.8, x, y, channel);
+            }
+        }
+    }
+}
+
+function downloadBlob(data: any, fileName: string, mimeType: string) {
     let blob, url: any;
     blob = new Blob([data], {
         type: mimeType

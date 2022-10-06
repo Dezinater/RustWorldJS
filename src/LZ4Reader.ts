@@ -50,6 +50,7 @@ export default class LZ4Reader {
             return false;
         }
         do {
+            
             let varint = this.TryReadVarInt();
             if (varint == undefined) return false;
             let flags = varint as ChunkFlags;
@@ -71,7 +72,7 @@ export default class LZ4Reader {
                 if (this._buffer == null || this._buffer.length < originalLength) {
                     this._buffer = new Uint8Array(new ArrayBuffer(originalLength));
                 }
-                var passes = flags >> 2;
+                let passes = flags >> 2;
                 if (passes != 0) {
                     throw 'NotSupportedException("Chunks with multiple passes are not supported.")';
                 }
@@ -79,7 +80,6 @@ export default class LZ4Reader {
                 lz4.decompressBlock(compressed, this.currentOutput, 0, compressed.length, 0);
                 this._bufferLength = originalLength;
             }
-
             if (originalLength < BLOCK_SIZE) {
                 this.ended = true;
                 return;
@@ -99,7 +99,7 @@ export default class LZ4Reader {
         while (true) {
             buffer = this.dataview.getUint8(this.streamPosition)
             this.streamPosition++;
-
+            
             if (buffer == 0) {
                 if (count == 0) return undefined;
                 console.error("throw exception?")
@@ -123,7 +123,7 @@ export default class LZ4Reader {
     }
 
     ReadBlock(buffer: Uint8Array, offset: number, length: number) {
-        var total = 0;
+        let total = 0;
 
         while (length > 0) {
             let read = this.InnerStreamRead(buffer, offset, length);
