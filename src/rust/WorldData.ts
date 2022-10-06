@@ -113,6 +113,22 @@ export class MapData extends Message<MapData> {
 }
 
 export class WorldData extends Message<WorldData> {
+    constructor(size) {
+        super();
+        this.size = size;
+        this.maps = new Array<MapData>();
+        this.prefabs = new Array<PrefabData>();
+        this.paths = new Array<PathData>();
+    }
+
+    addMap(mapName: string, map: TerrainMap | TextMap) {
+        let newMap = new MapData();
+        newMap.name = mapName;
+        newMap.data = map.getDst();
+
+        this.maps.push(newMap)
+    }
+
     getTerrainMap(map: string | number, channels: number = undefined, dataType: string | "byte" | "short" | "int" = undefined): TerrainMap {
         if (this.maps == undefined) {
             return undefined;
@@ -128,15 +144,35 @@ export class WorldData extends Message<WorldData> {
         }
 
         if (channels != undefined && dataType != undefined) {
-            terrainMap = new TerrainMap(mapData.data, channels, dataType);
+            terrainMap = new TerrainMap(mapData.data, channels, dataType, this.size);
         } else {
             if (map in TERRAIN_MAPS) {
                 let mapInfo = TERRAIN_MAPS[map as keyof typeof TERRAIN_MAPS];
-                terrainMap = new TerrainMap(mapData.data, mapInfo.channels, mapInfo.dataType);
+                terrainMap = new TerrainMap(mapData.data, mapInfo.channels, mapInfo.dataType, this.size);
             }
         }
 
         return terrainMap;
+    }
+
+
+    //seems like res is usually a power of 2, closest to the map size and +/- 1 sometimes?
+    //any res should work but probably best to follow how procgen does it
+    //map size - res
+    //2000 - 1024
+    //4250 - 4097
+    createEmptyTerrainMap(map: string, res: number) {
+        let mapInfo = TERRAIN_MAPS[map as keyof typeof TERRAIN_MAPS];
+        if (mapInfo != undefined) {
+            let size = res * res * mapInfo.channels;
+            if (mapInfo.dataType == "short") {
+                size *= 2;
+            } else if (mapInfo.dataType == "int") {
+                size *= 4;
+            }
+
+            return new TerrainMap(new Uint8Array(new ArrayBuffer(size)), mapInfo.channels, mapInfo.dataType, this.size)
+        }
     }
 
     getTextMap(map: string | number) {
