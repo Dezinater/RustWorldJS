@@ -4,7 +4,9 @@ import { BLOCK_SIZE, ChunkFlags } from "./LZ4Helper";
 let writePosition = 0;
 let currentOutput = new Array(0);
 
-onmessage = function (e) {
+addEventListener('message', e => {
+    writePosition = 0;
+    
     let { index, bytes } = e.data;
     currentOutput = new Array(bytes.byteLength);
 
@@ -18,11 +20,10 @@ onmessage = function (e) {
         compressedLength = bytes.byteLength;
     }
 
-    var isCompressed = compressedLength < BLOCK_SIZE;
-    var flags = ChunkFlags.None;
+    let isCompressed = compressedLength < BLOCK_SIZE;
+    let flags = ChunkFlags.None;
 
     if (isCompressed) flags |= ChunkFlags.Compressed;
-
     WriteVarInt(flags);
     WriteVarInt(bytes.byteLength);
     if (isCompressed) WriteVarInt(compressedLength);
@@ -31,13 +32,14 @@ onmessage = function (e) {
     finalOutput.set(new Uint8Array(currentOutput.slice(0, writePosition)), 0);
     finalOutput.set(new Uint8Array(compressed), writePosition);
 
-    this.postMessage({ index, bytes: finalOutput });
-}
+    postMessage({ index, bytes: finalOutput });
+});
 
 function WriteVarInt(value) {
     let bufferVal;
+    
     while (true) {
-        var b = (value & 0x7F);
+        let b = (value & 0x7F);
         value >>= 7;
         bufferVal = (b | (value == 0 ? 0 : 0x80));
         currentOutput[writePosition] = bufferVal;

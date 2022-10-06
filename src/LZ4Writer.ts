@@ -1,5 +1,7 @@
-const WORKERS_AMOUNT = 8;
+import Worker from 'web-worker';
 import { BLOCK_SIZE } from "./LZ4Helper";
+
+const WORKERS_AMOUNT = 8;
 
 export default class LZ4Writer {
     bytes: ArrayBuffer;
@@ -25,7 +27,7 @@ export default class LZ4Writer {
         this.workersDone = 0;
         this.workers = new Array(WORKERS_AMOUNT);
         for (let i = 0; i < WORKERS_AMOUNT; i++) {
-            this.workers.push(new Worker(new URL('./worker.js', import.meta.url)));
+            this.workers[i] = new Worker(new URL('./worker', import.meta.url));
         }
     }
 
@@ -34,7 +36,7 @@ export default class LZ4Writer {
         let flatOutput = new Uint8Array(new ArrayBuffer(size));
 
         let finalWritePos = 0;
-        this.writeChunks.forEach((chunk) => {
+        this.writeChunks.forEach((chunk, i) => {
             flatOutput.set(chunk, finalWritePos);
             finalWritePos += chunk.length;
         });
@@ -45,6 +47,9 @@ export default class LZ4Writer {
 
         this.finalOutput = finalMap;
         this.writeChunks = new Array(0);
+
+        this.workers.forEach(worker => worker.terminate());
+
         return this.finalOutput;
     }
 
@@ -55,26 +60,25 @@ export default class LZ4Writer {
                 return;
             }
 
-            let workersRequired = Math.ceil(this.bytes.byteLength / BLOCK_SIZE);
-
+            let workersRequired = Math.ceil(this.bytes.byteLength / BLOCK_SIZE)
             this.workers.forEach(worker => {
                 this.startWorker(worker);
 
-                worker.onmessage = (e) => {
+                worker.addEventListener('message', e => {
                     this.workersDone++;
                     let { index, bytes } = e.data;
                     this.writeChunks[index] = bytes;
-
+                    
                     if (this.workersDone >= workersRequired) {
                         if (this.canWrite) {
                             this.workersFinished();
                             this.canWrite = false;
                             resolve(this.finalOutput);
                         }
-                    } else {
+                    } else if (this.workersStarted < workersRequired) {
                         this.startWorker(worker);
                     }
-                };
+                });
             });
         });
     }
