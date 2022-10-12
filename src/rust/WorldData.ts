@@ -24,7 +24,7 @@ const TERRAIN_MAPS = {
         channels: 1
     },
     "biome": {
-        dataType: "short",
+        dataType: "byte",
         channels: 4
     },
     "alpha": {
@@ -162,6 +162,22 @@ export class WorldData extends Message<WorldData> {
     //2000 - 1024
     //4250 - 4097
     createEmptyTerrainMap(map: string, res: number) {
+        if (res == undefined) {
+            if (["terrain", "height", "water"].includes(map)) {
+                if (this.size < 3072) {
+                    res = 2049;
+                } else {
+                    res = 4097;
+                }
+            } else { //all other maps
+                if (this.size <= 2048) {
+                    res = 1024;
+                } else if (this.size < 8192) {
+                    res = 2048;
+                }
+            }
+        }
+
         let mapInfo = TERRAIN_MAPS[map as keyof typeof TERRAIN_MAPS];
         if (mapInfo != undefined) {
             let size = res * res * mapInfo.channels;
