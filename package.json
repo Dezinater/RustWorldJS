@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
+  "license": "BSD-2-Clause",
   "exports": "./dist/index.js",
   "scripts": {
     "serve": "webpack serve --mode=development",
