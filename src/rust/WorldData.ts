@@ -129,7 +129,16 @@ export class WorldData extends Message<WorldData> {
         this.maps.push(newMap)
     }
 
-    getTerrainMap(map: string | number, channels: number = undefined, dataType: string | "byte" | "short" | "int" = undefined): TerrainMap {
+    setMap(mapName: string, map: TerrainMap | TextMap) {
+        let findMap = this.maps.find(x => x.name == mapName);
+        if (findMap != undefined) {
+            findMap.data = map.getDst();
+        } else {
+            this.addMap(mapName, map);
+        }
+    }
+
+    getMapAsTerrain(map: string | number, channels: number = undefined, dataType: string | "byte" | "short" | "int" = undefined): TerrainMap {
         if (this.maps == undefined) {
             return undefined;
         }
@@ -191,7 +200,7 @@ export class WorldData extends Message<WorldData> {
         }
     }
 
-    getTextMap(map: string | number) {
+    getMapAsText(map: string | number) {
         if (this.maps == undefined) {
             return undefined;
         }
