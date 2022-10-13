@@ -22,31 +22,31 @@ describe('Load Map', function () {
 
     describe('Map Contents', function () {
         it('should contain a terrain map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("terrain"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("terrain"), undefined);
         });
         
         it('should contain a height map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("height"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("height"), undefined);
         });
         
         it('should contain a water map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("water"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("water"), undefined);
         });
         
         it('should contain a splat map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("splat"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("splat"), undefined);
         });
         
         it('should contain a topology map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("topology"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("topology"), undefined);
         });
         
         it('should contain a biome map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("biome"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("biome"), undefined);
         });
 
         it('should contain a alpha map', function () {
-            assert.notEqual(loadedMap.getTerrainMap("alpha"), undefined);
+            assert.notEqual(loadedMap.getMapAsTerrain("alpha"), undefined);
         });
     });
 });
