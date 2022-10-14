@@ -1,7 +1,7 @@
-var assert = require('assert');
-var fs = require('fs');
+import assert from 'assert';
+import * as fs from "fs";
 
-import { readMap, WorldData } from "../src/index";
+import { readMap, WorldData } from "../src/index.js";
 
 let loadedMap: WorldData;
 

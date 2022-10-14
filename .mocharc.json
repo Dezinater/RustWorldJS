@@ -3,5 +3,5 @@
         "ts"
     ],
     "spec": "test/**/*.spec.ts",
-    "require": ["test/babel-register.js"]
+    "loader": "ts-node/esm"
 }
