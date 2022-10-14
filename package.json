@@ -2,12 +2,14 @@
   "name": "rustworldjs",
   "version": "0.1.0",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "license": "BSD-2-Clause",
   "exports": "./dist/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "serve": "webpack serve --mode=development",
-    "compile": "babel ./src -d dist --extensions .ts,.js",
+    "compile": "babel ./src -d dist --extensions .ts,.js & tsc --emitDeclarationOnly",
+    "compiletest": "tsc",
     "build": "webpack --mode=production",
     "test": "mocha"
   },

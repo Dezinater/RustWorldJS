@@ -1,7 +1,5 @@
-const lz4 = require("./lz4/lz4.js");
-import { BLOCK_SIZE } from "./LZ4Helper";
-import { ChunkFlags } from "./LZ4Helper";
-import { memcpy } from "./LZ4Helper";
+import * as lz4 from "./lz4/lz4.js";
+import { BLOCK_SIZE, ChunkFlags, memcpy } from "./LZ4Helper.js";
 
 export default class LZ4Reader {
     bytes: Uint8Array;

@@ -1,6 +1,8 @@
 // Simple hash function, from: http://burtleburtle.net/bob/hash/integer.html.
 // Chosen because it doesn't use multiply and achieves full avalanche.
-exports.hashU322 = function hashU32(a) {
+export { hashU322, hashU32, readU64, readU32, writeU32, imul };
+
+function hashU322(a) {
     a = a | 0;
     a = a + 2127912214 + (a << 12) | 0;
     a = a ^ -949894596 ^ a >>> 19;
@@ -10,12 +12,12 @@ exports.hashU322 = function hashU32(a) {
     return a ^ -1252372727 ^ a >>> 16 | 0;
 }
 
-exports.hashU32 = function hashU32(a) {
-    return (((a) * 2654435761) >> ((4*8)-13))
+function hashU32(a) {
+    return (((a) * 2654435761) >> ((4 * 8) - 13))
 }
 
 // Reads a 64-bit little-endian integer from an array.
-exports.readU64 = function readU64(b, n) {
+function readU64(b, n) {
     var x = 0;
     x |= b[n++] << 0;
     x |= b[n++] << 8;
@@ -29,7 +31,7 @@ exports.readU64 = function readU64(b, n) {
 }
 
 // Reads a 32-bit little-endian integer from an array.
-exports.readU32 = function readU32(b, n) {
+function readU32(b, n) {
     var x = 0;
     x |= b[n++] << 0;
     x |= b[n++] << 8;
@@ -39,7 +41,7 @@ exports.readU32 = function readU32(b, n) {
 }
 
 // Writes a 32-bit little-endian integer from an array.
-exports.writeU32 = function writeU32(b, n, x) {
+function writeU32(b, n, x) {
     b[n++] = (x >> 0) & 0xff;
     b[n++] = (x >> 8) & 0xff;
     b[n++] = (x >> 16) & 0xff;
@@ -48,7 +50,7 @@ exports.writeU32 = function writeU32(b, n, x) {
 
 // Multiplies two numbers using 32-bit integer multiplication.
 // Algorithm from Emscripten.
-exports.imul = function imul(a, b) {
+function imul(a, b) {
     var ah = a >>> 16;
     var al = a & 65535;
     var bh = b >>> 16;

@@ -7,9 +7,10 @@
 // - Better error handling (handle bad offset, etc.)
 // - HC support (better search algorithm)
 // - Tests/benchmarking
+import * as xxhash from "./xxh32.js";
+import * as util from "./util.js";
 
-var xxhash = require('./xxh32.js');
-var util = require('./util.js');
+export { decompressBlock, compressBlock };
 
 // Constants
 // --
@@ -128,12 +129,12 @@ function sliceArray(array, start, end) {
 // --
 
 // Calculates an upper bound for lz4 compression.
-exports.compressBound = function compressBound(n) {
+function compressBound(n) {
   return (n + (n / 255) + 16) | 0;
 };
 
 // Calculates an upper bound for lz4 decompression, by reading the data.
-exports.decompressBound = function decompressBound(src) {
+function decompressBound(src) {
   var sIndex = 0;
 
   // Read magic number
@@ -197,11 +198,9 @@ exports.decompressBound = function decompressBound(src) {
   }
 };
 
-// Creates a buffer of a given byte-size, falling back to plain arrays.
-exports.makeBuffer = makeBuffer;
 
 // Decompresses a block of Lz4.
-exports.decompressBlock = function decompressBlock(src, dst, sIndex, sLength, dIndex) {
+function decompressBlock(src, dst, sIndex, sLength, dIndex) {
   var mLength, mOffset, sEnd, n, i;
   var hasCopyWithin = dst.copyWithin !== undefined && dst.fill !== undefined;
 
@@ -275,7 +274,7 @@ exports.decompressBlock = function decompressBlock(src, dst, sIndex, sLength, dI
 };
 
 // Compresses a block with Lz4.
-exports.compressBlock = function compressBlock(src, dst, sIndex, sLength, hashTable) {
+function compressBlock(src, dst, sIndex, sLength, hashTable) {
   var mIndex, mAnchor, mLength, mOffset, mStep;
   var literalCount, dIndex, sEnd, n;
 
@@ -395,7 +394,7 @@ exports.compressBlock = function compressBlock(src, dst, sIndex, sLength, hashTa
 };
 
 // Decompresses a frame of Lz4 data.
-exports.decompressFrame = function decompressFrame(src, dst) {
+function decompressFrame(src, dst) {
   var useBlockSum, useContentSum, useContentSize, descriptor;
   var sIndex = 0;
   var dIndex = 0;
@@ -461,7 +460,7 @@ exports.decompressFrame = function decompressFrame(src, dst) {
       }
     } else {
       // Decompress into blockBuf
-      dIndex = exports.decompressBlock(src, dst, sIndex, compSize, dIndex);
+      dIndex = decompressBlock(src, dst, sIndex, compSize, dIndex);
       sIndex += compSize;
     }
   }
@@ -475,7 +474,7 @@ exports.decompressFrame = function decompressFrame(src, dst) {
 };
 
 // Compresses data to an Lz4 frame.
-exports.compressFrame = function compressFrame(src, dst) {
+function compressFrame(src, dst) {
   var dIndex = 0;
 
   // Write magic number.
@@ -503,7 +502,7 @@ exports.compressFrame = function compressFrame(src, dst) {
     var compSize = 0;
     var blockSize = remaining > maxBlockSize ? maxBlockSize : remaining;
 
-    compSize = exports.compressBlock(src, blockBuf, sIndex, blockSize, hashTable);
+    compSize = compressBlock(src, blockBuf, sIndex, blockSize, hashTable);
 
     if (compSize > blockSize || compSize === 0) {
       // Output uncompressed.
@@ -539,14 +538,14 @@ exports.compressFrame = function compressFrame(src, dst) {
 // Decompresses a buffer containing an Lz4 frame. maxSize is optional; if not
 // provided, a maximum size will be determined by examining the data. The
 // buffer returned will always be perfectly-sized.
-exports.decompress = function decompress(src, maxSize) {
+function decompress(src, maxSize) {
   var dst, size;
 
   if (maxSize === undefined) {
-    maxSize = exports.decompressBound(src);
+    maxSize = decompressBound(src);
   }
-  dst = exports.makeBuffer(maxSize);
-  size = exports.decompressFrame(src, dst);
+  dst = makeBuffer(maxSize);
+  size = decompressFrame(src, dst);
 
   if (size !== maxSize) {
     dst = sliceArray(dst, 0, size);
@@ -558,15 +557,15 @@ exports.decompress = function decompress(src, maxSize) {
 // Compresses a buffer to an Lz4 frame. maxSize is optional; if not provided,
 // a buffer will be created based on the theoretical worst output size for a
 // given input size. The buffer returned will always be perfectly-sized.
-exports.compress = function compress(src, maxSize) {
+function compress(src, maxSize) {
   var dst, size;
 
   if (maxSize === undefined) {
-    maxSize = exports.compressBound(src.length);
+    maxSize = compressBound(src.length);
   }
 
-  dst = exports.makeBuffer(maxSize);
-  size = exports.compressFrame(src, dst);
+  dst = makeBuffer(maxSize);
+  size = compressFrame(src, dst);
 
   if (size !== maxSize) {
     dst = sliceArray(dst, 0, size);

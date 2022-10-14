@@ -1,8 +1,8 @@
-import LZ4Reader from './LZ4Reader';
-import { WorldData } from './rust/WorldData';
-import TerrainMap from './rust/TerrainMap';
-import TextMap from './rust/TextMap';
-import LZ4Writer from './LZ4Writer';
+import { WorldData } from './rust/WorldData.js';
+import LZ4Reader from './LZ4Reader.js';
+import TerrainMap from './rust/TerrainMap.js';
+import TextMap from './rust/TextMap.js';
+import LZ4Writer from './LZ4Writer.js';
 
 export { WorldData, TerrainMap, TextMap };
 
@@ -174,8 +174,8 @@ async function drawMap(decoded: WorldData) {
     canvas.width = decoded.size;
     canvas.height = decoded.size;
 
-    let heightMap = decoded.getTerrainMap("terrain"); //terrain is a better heightmap than 'height'
-    let splatMap = decoded.getTerrainMap("splat");
+    let heightMap = decoded.getMapAsTerrain("terrain"); //terrain is a better heightmap than 'height'
+    let splatMap = decoded.getMapAsTerrain("splat");
 
     //change coordinate system to match rust
     ctx.translate(0, canvas.height);
@@ -202,12 +202,12 @@ async function drawMap(decoded: WorldData) {
 
     //draw splats
     for (let i = 7; i >= 0; i--) {
-        imageData = await createImageBitmap(convertToImageData(ctx, splatMap.getChannel(i), splatMap.res, splatTypes[i]));
+        imageData = await createImageBitmap(convertToImageData(ctx, splatMap.getChannel(i), decoded.size, splatTypes[i]));
         ctx.drawImage(imageData, 0, 0, canvas.width, canvas.height);
     }
 
     //draw coastal waters
-    let filteredTerrain = heightMap.dst.map(x => x *= 1 / 255).map(x => {
+    let filteredTerrain = heightMap.getChannel(0).map(x => x *= 1 / 255).map(x => {
         if (x > 60 && x <= 63) {
             return 235 - (25 * (x - 60));
         }
@@ -218,6 +218,6 @@ async function drawMap(decoded: WorldData) {
         return 255;
     });
 
-    imageData = await createImageBitmap(convertToImageData(ctx, filteredTerrain, heightMap.res, [18, 64, 77], true));
+    imageData = await createImageBitmap(convertToImageData(ctx, filteredTerrain, decoded.size, [18, 64, 77], true));
     ctx.drawImage(imageData, 0, 0, canvas.width, canvas.height);
 }

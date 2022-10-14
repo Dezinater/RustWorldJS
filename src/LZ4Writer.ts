@@ -1,5 +1,5 @@
 import Worker from 'web-worker';
-import { BLOCK_SIZE } from "./LZ4Helper";
+import { BLOCK_SIZE } from "./LZ4Helper.js";
 
 const WORKERS_AMOUNT = 8;
 
@@ -27,7 +27,7 @@ export default class LZ4Writer {
         this.workersDone = 0;
         this.workers = new Array(WORKERS_AMOUNT);
         for (let i = 0; i < WORKERS_AMOUNT; i++) {
-            this.workers[i] = new Worker(new URL('./worker', import.meta.url));
+            this.workers[i] = new Worker(new URL('./worker.cjs', import.meta.url));
         }
     }
 
@@ -68,7 +68,7 @@ export default class LZ4Writer {
                     this.workersDone++;
                     let { index, bytes } = e.data;
                     this.writeChunks[index] = bytes;
-                    
+ 
                     if (this.workersDone >= workersRequired) {
                         if (this.canWrite) {
                             this.workersFinished();

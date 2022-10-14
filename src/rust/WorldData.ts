@@ -1,6 +1,14 @@
-import { Message, Type, Field, OneOf } from "protobufjs/light"; // respectively "./node_modules/protobufjs/light.js"
-import TerrainMap from "./TerrainMap";
-import TextMap from "./TextMap";
+//import * as pkg from "protobufjs/light.js"; // respectively "./node_modules/protobufjs/light.js"
+//console.log(pkg);
+//let { Message, Field } = pkg;
+import pkg from 'protobufjs/light.js';
+const { Message, Field } = pkg;
+//const { Message, Type, Field, OneOf } = require("protobufjs/light");
+//import { Message, Type, Field, OneOf } from "protobufjs/light.js"; // respectively "./node_modules/protobufjs/light.js"
+import TerrainMap from "./TerrainMap.js";
+import TextMap from "./TextMap.js";
+
+export { Message, Field };
 
 const TERRAIN_MAPS = {
     "terrain": {

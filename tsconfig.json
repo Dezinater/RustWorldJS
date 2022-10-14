@@ -3,13 +3,16 @@
         "target": "esnext",
         "module": "esnext",
         "outDir": "./dist",
-        "rootDir": "../",
+        "esModuleInterop": true,
+        "rootDir": "src",
         "noEmit": false,
+        "allowJs": true,
         "moduleResolution":"node",
+        "declaration": true,
         "experimentalDecorators": true
     },
     "include": [
-        "src/**/*",
+        "src/",
         "test/index.spec.ts"
     ],
     "exclude": [
