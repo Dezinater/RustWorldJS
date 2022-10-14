@@ -6,6 +6,8 @@ import { readMap, WorldData } from "../src/index.js";
 let loadedMap: WorldData;
 
 describe('Load Map', function () {
+    this.timeout(15000);
+
     before(function (done) {
         fs.readFile('./test/test.map', function (err, fileContents) {
             if (err) throw err;
