@@ -1,15 +1,12 @@
 {
   "name": "rustworldjs",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "type": "module",
   "license": "BSD-2-Clause",
   "exports": "./dist/index.js",
   "main": "./dist/index.js",
   "scripts": {
-    "serve": "webpack serve --mode=development",
     "compile": "tsc",
-    "build": "webpack --mode=production",
     "test": "mocha"
   },
   "directories": {
