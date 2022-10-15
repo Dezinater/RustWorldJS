@@ -63,7 +63,6 @@ export default class TerrainMap {
         });
 
         let returnArray = new Uint8Array(finalArray.buffer, finalArray.byteOffset, finalArray.byteLength);
-        //console.log(returnArray);
         return returnArray;
     }
 

@@ -1,5 +1,3 @@
-//import * as lz4 from "./lz4/lz4.js";
-//import { BLOCK_SIZE, ChunkFlags } from "./LZ4Helper.js";
 let lz4, BLOCK_SIZE, ChunkFlags;
 let importPromises = [
     import('./lz4/lz4.js').then(x => lz4 = x),

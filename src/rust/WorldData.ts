@@ -1,10 +1,6 @@
-//import * as pkg from "protobufjs/light.js"; // respectively "./node_modules/protobufjs/light.js"
-//console.log(pkg);
-//let { Message, Field } = pkg;
 import pkg from 'protobufjs/light.js';
 const { Message, Field } = pkg;
-//const { Message, Type, Field, OneOf } = require("protobufjs/light");
-//import { Message, Type, Field, OneOf } from "protobufjs/light.js"; // respectively "./node_modules/protobufjs/light.js"
+
 import TerrainMap from "./TerrainMap.js";
 import TextMap from "./TextMap.js";
 
@@ -172,12 +168,6 @@ export class WorldData extends Message<WorldData> {
         return terrainMap;
     }
 
-
-    //seems like res is usually a power of 2, closest to the map size and +/- 1 sometimes?
-    //any res should work but probably best to follow how procgen does it
-    //map size - res
-    //2000 - 1024
-    //4250 - 4097
     createEmptyTerrainMap(map: string, res: number) {
         if (res == undefined) {
             if (["terrain", "height", "water"].includes(map)) {
