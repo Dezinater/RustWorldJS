@@ -1,5 +1,9 @@
-const fs = require("fs");
-const rustWorld = require("rustworldjs");
+import * as fs from "fs";
+import * as rustWorld from "rustworldjs";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 fs.readFile(__dirname + '/../../test/test.map', function (err, fileContents) {
     let world = rustWorld.readMap(fileContents);

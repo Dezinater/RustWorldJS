@@ -1,5 +1,5 @@
-const fs = require("fs");
-const rustWorld = require("rustworldjs");
+import * as fs from "fs";
+import * as rustWorld from "rustworldjs";
 
 const WORLD_SIZE = 5000;
 const RADIUS = 45;
