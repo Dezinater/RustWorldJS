@@ -5,6 +5,9 @@
   "license": "BSD-2-Clause",
   "exports": "./dist/index.js",
   "main": "./dist/index.js",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "compile": "tsc",
     "test": "mocha"
