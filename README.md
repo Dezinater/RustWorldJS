@@ -7,6 +7,26 @@ Install the RustWorldJS package into your project
 npm install rustworld
 ```
 
+## Usage
+
+```
+import * as rustWorld from "rustworld";
+
+import * as fs from "fs";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+fs.readFile(__dirname + '/../../test/test.map', function (err, fileContents) {
+    let world = rustWorld.readMap(fileContents);
+
+    rustWorld.writeMap(world).then(bytes => {
+        // write bytes to file
+    });
+});
+```
+
 The package comes with Typescript definitions so if you are using Typescript you will be able to see every method and class available to use. To get started take a look at the examples for some code samples.
 
  - [generate-circle-plots](https://github.com/Dezinater/RustWorldJS/tree/master/examples/generate-circle-plots)
