@@ -14,7 +14,7 @@ The package comes with Typescript definitions so if you are using Typescript you
  - [get-terrainmap-info](https://github.com/Dezinater/RustWorldJS/tree/master/examples/get-terrainmap-info)
  - [ice-walls](https://github.com/Dezinater/RustWorldJS/tree/master/examples/ice-walls)
 
-# LZ4 Compression
+## LZ4 Compression
 
 The original [Rust.World SDK](https://github.com/Facepunch/Rust.World) and the game itself uses LZ4 compression for map reading and writing. They use a library called [lz4net](https://github.com/MiloszKrajewski/lz4net) which is now outdated and has a custom implementation of LZ4. RustWorldJS recreates and uses that same custom implementation of LZ4. 
 
