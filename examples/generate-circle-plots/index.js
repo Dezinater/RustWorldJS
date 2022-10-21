@@ -9,7 +9,6 @@ const WALL_SIZE = 4;
 main();
 function main() {
     let newWorld = new rustWorld.WorldData(WORLD_SIZE);
-    //these values are set for a 2000 sized map
     let terrainMap = newWorld.createEmptyTerrainMap("terrain");
     let heightMap = newWorld.createEmptyTerrainMap("height");
     let waterMap = newWorld.createEmptyTerrainMap("water");
@@ -49,6 +48,7 @@ function main() {
         }
     }
 
+    //add map to the world and encode into bytes
     newWorld.addMap("terrain", terrainMap);
     newWorld.addMap("height", heightMap);
     newWorld.addMap("splat", splatMap);

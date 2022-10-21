@@ -17,7 +17,8 @@ fs.readFile(__dirname + inputMapFile + '.map', function (err, fileContents) {
     fillCircle(terrainMap, center, 420, world.size, 0.4);
     fillSplatsCircle(splatMap, center, 420, world.size);
 
-    world.setMap("terrain", terrainMap); //encode the terrain object back into bytes
+    //encode the terrain objects back into bytes
+    world.setMap("terrain", terrainMap); 
     world.setMap("splat", splatMap);
 
     rustWorld.writeMap(world).then(bytes => {
