@@ -7,9 +7,10 @@ Install the RustWorldJS package into your project
 npm install rustworld
 ```
 
+
 ## Usage
 
-```
+```javascript
 import * as rustWorld from "rustworld";
 
 import * as fs from "fs";
@@ -33,6 +34,7 @@ The package comes with Typescript definitions so if you are using Typescript you
  - [get-map-size](https://github.com/Dezinater/RustWorldJS/tree/master/examples/get-map-size)
  - [get-terrainmap-info](https://github.com/Dezinater/RustWorldJS/tree/master/examples/get-terrainmap-info)
  - [ice-walls](https://github.com/Dezinater/RustWorldJS/tree/master/examples/ice-walls)
+
 
 ## LZ4 Compression
 
