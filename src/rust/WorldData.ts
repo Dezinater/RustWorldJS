@@ -104,7 +104,11 @@ export class PrefabData extends Message<PrefabData>  {
 
     @Field.d(3, VectorData)
     public position: VectorData;
+
+    @Field.d(4, VectorData)
     public rotation: VectorData;
+
+    @Field.d(5, VectorData)
     public scale: VectorData;
 }
 
