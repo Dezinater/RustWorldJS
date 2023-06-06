@@ -9,6 +9,7 @@ export default class LZ4Reader {
     currentOutput: number[];
     streamPosition: number;
     ended: boolean;
+    finalSize: number;
     finalOutput: Uint8Array;
     finalChunks: Array<number>[];
 
@@ -27,8 +28,9 @@ export default class LZ4Reader {
             this.finalChunks.push(this.currentOutput.slice(0, this._bufferLength));
         }
 
-        let size = this.finalChunks.map(x => x.length).reduce((lastVal, currVal) => lastVal + currVal, 0);
-        this.finalOutput = new Uint8Array(new ArrayBuffer(size));
+        this.finalSize = this.finalChunks.map(x => x.length).reduce((lastVal, currVal) => lastVal + currVal, 0);
+
+        this.finalOutput = new Uint8Array(new ArrayBuffer(this.finalSize));
 
         this.finalChunks.forEach((chunk, index) => {
             this.finalOutput.set(chunk, index * BLOCK_SIZE);

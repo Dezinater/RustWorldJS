@@ -4,7 +4,7 @@ import TerrainMap from './rust/TerrainMap.js';
 import TextMap from './rust/TextMap.js';
 import LZ4Writer from './LZ4Writer.js';
 
-export { WorldData, TerrainMap, TextMap };
+export { WorldData, TerrainMap, TextMap, LZ4Reader };
 
 export function readMap(bytes: ArrayBuffer) {
     let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
