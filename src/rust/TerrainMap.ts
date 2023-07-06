@@ -38,19 +38,51 @@ export default class TerrainMap {
         this.type = type;
     }
 
-    resize(pixels, w1, h1, w2, h2) { //nearest neighbour
-        let temp = new pixels.constructor(Array(w2 * h2));
-        let x_ratio = w1 / w2;
-        let y_ratio = h1 / h2;
-        let px, py;
-        for (let i = 0; i < h2; i++) {
-            for (let j = 0; j < w2; j++) {
-                px = Math.floor(j * x_ratio);
-                py = Math.floor(i * y_ratio);
-                temp[(i * w2) + j] = pixels[(py * w1) + px];
+    resize(inputArray, inputWidth, inputHeight, newWidth, newHeight) {
+        const scaleX = inputWidth / newWidth;
+        const scaleY = inputHeight / newHeight;
+
+        let outputArray = new inputArray.constructor(Array(newWidth * newHeight));
+
+        let interpolate = (c00, c10, c01, c11, weightX, weightY) => {
+            const interpolatedValue = (1 - weightX) * (1 - weightY) * c00 +
+                weightX * (1 - weightY) * c10 +
+                (1 - weightX) * weightY * c01 +
+                weightX * weightY * c11;
+
+            return interpolatedValue;
+        };
+
+        for (let y = 0; y < newHeight; y++) {
+            for (let x = 0; x < newWidth; x++) {
+                const srcX = x * scaleX;
+                const srcY = y * scaleY;
+
+                const x1 = Math.floor(srcX);
+                const y1 = Math.floor(srcY);
+                const x2 = Math.ceil(srcX);
+                const y2 = Math.ceil(srcY);
+
+                const weightX = srcX - x1;
+                const weightY = srcY - y1;
+
+                const indexTL = y1 * inputWidth + x1;
+                const indexTR = y1 * inputWidth + x2;
+                const indexBL = y2 * inputWidth + x1;
+                const indexBR = y2 * inputWidth + x2;
+
+                const topLeft = inputArray[indexTL];
+                const topRight = inputArray[indexTR];
+                const bottomLeft = inputArray[indexBL];
+                const bottomRight = inputArray[indexBR];
+
+                const interpolatedValue = interpolate(topLeft, topRight, bottomLeft, bottomRight, weightX, weightY);
+                const outputIndex = y * newWidth + x;
+                outputArray[outputIndex] = interpolatedValue;
             }
         }
-        return temp;
+
+        return outputArray;
     }
 
     getDst() {
