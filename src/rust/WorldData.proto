@@ -1,0 +1,46 @@
+package WorldData;
+syntax = "proto3";
+
+message VectorData {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message PathData {
+    optional string name = 1;
+    optional bool spline = 2;
+    optional bool start = 3;
+    optional bool end = 4;
+    optional float width = 5;
+    optional float innerPadding = 6;
+    optional float outerPadding = 7;
+    optional float innerFade = 8;
+    optional float outerFade = 9;
+    optional float randomScale = 10;
+    optional float meshOffset = 11;
+    optional float terrainOffset = 12;
+    optional int32 splat = 13;
+    optional int32 topology = 14;
+    repeated VectorData nodes = 15;
+}
+
+message PrefabData {
+    string category = 1;
+    uint32 id = 2;
+    VectorData position = 3;
+    VectorData rotation = 4;
+    VectorData scale = 5;
+}
+
+message MapData {
+    string name = 1;
+    bytes data = 2;
+}
+
+message WorldData {
+    uint32 size = 1;
+    repeated MapData maps = 2;
+    repeated PrefabData prefabs = 3;
+    repeated PathData paths = 4;
+}
