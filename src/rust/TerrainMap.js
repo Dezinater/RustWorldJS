@@ -14,13 +14,14 @@ export default class TerrainMap {
      * 
      * @param {Uint8Array} data 
      * @param {number} channels 
-     * @param {string | "int" | "short" | "byte"} type 
+     * @param {"int" | "short" | "byte"} type 
      * @param {number} worldSize 
      */
     constructor(data, channels, type, worldSize) {
         this.channels = channels;
         this.worldSize = worldSize;
         let offset = data.byteOffset;
+        //removed string for dst type 
         /** @type {Uint8Array | Uint16Array | Uint32Array} */
         let dst;
 
@@ -36,8 +37,8 @@ export default class TerrainMap {
             case "int": dst = new Uint32Array(data.buffer, offset, data.byteLength / Uint32Array.BYTES_PER_ELEMENT); break;
             case "short": dst = new Uint16Array(data.buffer, offset, data.byteLength / Uint16Array.BYTES_PER_ELEMENT); break;
             case "byte": dst = new Uint8Array(data.buffer, offset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT); break;
-            //if no default dst will not be defined so dst.length cant be anything
-            default: dst = new Uint8Array(data.buffer, offset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT); break;
+            //if no default dst will not be defined so dst.length cant be anything or remove string as type for dst?
+            //default: dst = new Uint8Array(data.buffer, offset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT); break;
         }
 
         this.data = new Array();
