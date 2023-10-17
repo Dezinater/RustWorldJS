@@ -40,7 +40,7 @@ export default class LZ4Writer {
         this.workersDone = 0;
         this.workers = new Array(WORKERS_AMOUNT);
         for (let i = 0; i < WORKERS_AMOUNT; i++) {
-            this.workers[i] = new Worker(new URL('./worker.js', import.meta.url));
+            this.workers[i] = new Worker(new URL('./worker.cjs', import.meta.url));
         }
     }
 
@@ -66,6 +66,10 @@ export default class LZ4Writer {
         return this.finalOutput;
     }
 
+    /**
+     * 
+     * @returns {Promise<Uint8Array>}
+     */
     getOutput() {
         return new Promise((resolve) => {
             if (!this.canWrite) {
