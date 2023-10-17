@@ -277,7 +277,7 @@ export class WorldData {
     /**
      * 
      * @param {string} map 
-     * @param {number} res 
+     * @param {number} [res] 
      * @returns 
      */
     createEmptyTerrainMap(map, res) {
@@ -291,7 +291,7 @@ export class WorldData {
             } else { //all other maps
                 if (this.size <= 2048) {
                     res = 1024;
-                } else if (this.size < 8192) {
+                } else {
                     res = 2048;
                 }
             }
