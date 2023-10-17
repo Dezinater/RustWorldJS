@@ -2,6 +2,7 @@
 node_modules
 /dist
 /public/*.map
+/test/test-write.map
 
 
 # local env files

@@ -160,11 +160,10 @@ export const WorldData_pb = new Type("WorldData")
 
 /**
  * 
- * @extends {Message<WorldData>}
  * @category WorldData
  * @hideconstructor
  */
-export class WorldData extends Message {
+export class WorldData {
     /** @type {number} */
     size;
     /** @type {MapData_C[]} */
@@ -175,26 +174,41 @@ export class WorldData extends Message {
     paths;
 
     /**
-     * 
-     * @param {number | undefined} size 
-     * @param {Uint8Array | protobuf.Reader} data 
+     * @param {number} size 
      */
-    constructor(size, data) {
-        super(); // {$type: WorldData_pb} as argument to stop using workaround
-        this.size = size ? size : 0;
+    constructor(size) {
+        this.size = size;
         this.maps = [];
         this.prefabs = [];
         this.paths = [];
-
-        if (data) {
-            /** @type {*} */
-            const decoded = WorldData_pb.decode(data);
-            this.size = decoded.size;
-            this.maps = decoded.maps;
-            this.prefabs = decoded.prefabs;
-            this.paths = decoded.paths;
-        }
     }
+
+    /**
+     * 
+     * @param {Uint8Array | protobuf.Reader} reader 
+     * @param {number | undefined} [length] 
+     */
+    static decode = (reader, length) => {
+        /** @type {*} */
+        const decoded = WorldData_pb.decode(reader, length);
+        const newClass = new WorldData(0);
+        newClass.size = decoded.size;
+        newClass.maps = decoded.maps;
+        newClass.prefabs = decoded.prefabs;
+        newClass.paths = decoded.paths;
+        return newClass;
+    };
+
+    /**
+     * 
+     * @param {protobuf.Message<{}> | {[k: string]: any;}} message 
+     * @param {protobuf.Writer | undefined} [writer] 
+     * @returns 
+     */
+    static encode = (message, writer) => {
+        /** @type {*} */
+        return WorldData_pb.encode(message, writer);
+    };;
 
     /**
      * 

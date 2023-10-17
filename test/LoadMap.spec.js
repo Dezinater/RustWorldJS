@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as fs from "fs";
 
-import { readMap, WorldData } from "../src/index.js";
+import { readMap, writeMap, WorldData } from "../src/index.js";
 
 /** @type WorldData */
 let loadedMap;
@@ -50,6 +50,26 @@ describe('Load Map', function () {
 
         it('should contain a alpha map', function () {
             assert.notEqual(loadedMap.getMapAsTerrain("alpha"), undefined);
+        });
+    });
+});
+
+describe('Write Map', function () {
+    this.timeout(15000);
+
+    before(function (done) {
+        fs.readFile('./test/test.map', function (err, fileContents) {
+            if (err) throw err;
+            loadedMap = readMap(fileContents);
+            done();
+        });
+    });
+
+    it('Writing...', async function () {
+        const data = await writeMap(loadedMap)
+        fs.writeFile('./test/test-write.map', data, {}, function (err, res) {
+            if (err) throw err;
+            assert.equal(true, true);
         });
     });
 });
