@@ -1,4 +1,4 @@
-import lz4 from './lz4/lz4.js';
+import * as lz4 from './lz4/lz4.js';
 import { BLOCK_SIZE, ChunkFlags } from './LZ4Helper.js';
 
 let writePosition = 0;
