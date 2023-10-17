@@ -35,8 +35,7 @@ const TERRAIN_MAPS = {
     },
 };
 
-const Root  = protobuf.Root,
-    Message = protobuf.Message,
+const Message = protobuf.Message,
     Type  = protobuf.Type,
     Field = protobuf.Field;
 
@@ -115,8 +114,6 @@ export class MapData_C extends Message {
 }
 
 
-
-
 const VectorData = new Type("VectorData")
     .add(new Field("x", 1, "float"))
     .add(new Field("y", 2, "float"))
@@ -162,13 +159,6 @@ export const WorldData_pb = new Type("WorldData")
     .add(new Field("prefabs", 3, "PrefabData", "repeated"))
     .add(new Field("paths", 4, "PathData", "repeated"));
 
-// const root = new Root().define("WorldData")
-//     .add(WorldData_pb)
-//     .add(VectorData)
-//     .add(PathData)
-//     .add(PrefabData)
-//     .add(MapData);
-
 /**
  * 
  * @extends {Message<WorldData>}
@@ -191,7 +181,7 @@ export class WorldData extends Message {
      * @param {Uint8Array | protobuf.Reader} data 
      */
     constructor(size, data) {
-        super({$type: WorldData_pb});
+        super(); // {$type: WorldData_pb} as argument to stop using workaround
         this.size = size;
         this.maps = [];
         this.prefabs = [];
@@ -200,9 +190,6 @@ export class WorldData extends Message {
         if (data) {
             /** @type {*} */
             const decoded = WorldData_pb.decode(data);
-            
-            // {maps: [], prefabs: [], paths: [], size: 2}
-            //const decoded = root.lookupType('WorldData.WorldData').decode(data)
             this.size = decoded.size;
             this.maps = decoded.maps;
             this.prefabs = decoded.prefabs;
@@ -241,7 +228,7 @@ export class WorldData extends Message {
      * 
      * @param {string | number} map 
      * @param {number | undefined} channels 
-     * @param {string | "byte" | "short" | "int" | undefined} dataType 
+     * @param {"byte" | "short" | "int" | undefined} dataType 
      * @returns {TerrainMap | undefined}
      */
     getMapAsTerrain(map, channels = undefined, dataType = undefined) {
