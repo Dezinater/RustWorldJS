@@ -3,10 +3,10 @@
   "version": "1.0.2",
   "type": "module",
   "license": "BSD-2-Clause",
-  "exports": "./dist/index.js",
-  "main": "./dist/index.js",
+  "exports": "./src/index.js",
+  "main": "./src/index.js",
   "files": [
-    "/dist"
+    "/src"
   ],
   "scripts": {
     "test": "mocha"
