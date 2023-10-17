@@ -113,7 +113,6 @@ export class MapData_C extends Message {
     data;
 }
 
-
 const VectorData = new Type("VectorData")
     .add(new Field("x", 1, "float"))
     .add(new Field("y", 2, "float"))
@@ -177,12 +176,12 @@ export class WorldData extends Message {
 
     /**
      * 
-     * @param {number} size 
+     * @param {number | undefined} size 
      * @param {Uint8Array | protobuf.Reader} data 
      */
     constructor(size, data) {
         super(); // {$type: WorldData_pb} as argument to stop using workaround
-        this.size = size;
+        this.size = size ? size : 0;
         this.maps = [];
         this.prefabs = [];
         this.paths = [];
