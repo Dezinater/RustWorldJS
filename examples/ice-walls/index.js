@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as rustWorld from "rustworld";
+import * as rustWorld from "../../src/index.js";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -18,8 +18,8 @@ fs.readFile(__dirname + inputMapFile + '.map', function (err, fileContents) {
     fillSplatsCircle(splatMap, center, 420, world.size);
 
     //encode the terrain objects back into bytes
-    world.setMap("terrain", terrainMap); 
-    world.setMap("splat", splatMap);
+    if (terrainMap) world.setMap("terrain", terrainMap); 
+    if (splatMap) world.setMap("splat", splatMap);
 
     rustWorld.writeMap(world).then(bytes => {
         fs.writeFile(__dirname + inputMapFile + '-ice-wall.map', bytes, "binary", function (err) {

@@ -67,7 +67,7 @@ describe('Write Map', function () {
 
     it('Writing...', async function () {
         const data = await writeMap(loadedMap)
-        fs.writeFile('./test/test-write.map', data, {}, function (err, res) {
+        fs.writeFile('./test/test-write.map', data, "binary", function (err, res) {
             if (err) throw err;
             assert.equal(true, true);
         });
