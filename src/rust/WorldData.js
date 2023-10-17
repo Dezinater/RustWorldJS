@@ -3,6 +3,7 @@ import protobuf from 'protobufjs/light.js';
 import TerrainMap from "./TerrainMap.js";
 import TextMap from "./TextMap.js";
 
+
 const TERRAIN_MAPS = {
     "terrain": {
         dataType: "short",
@@ -35,8 +36,86 @@ const TERRAIN_MAPS = {
 };
 
 const Root  = protobuf.Root,
+    Message = protobuf.Message,
     Type  = protobuf.Type,
     Field = protobuf.Field;
+
+/**
+ * @extends {Message<VectorData_C>}
+ */
+export class VectorData_C extends Message {
+    /** @type {number} */
+    x;
+    /** @type {number} */
+    y;
+    /** @type {number} */
+    z;
+}
+
+/**
+ * @extends {Message<PathData_C>}
+ */
+export class PathData_C extends Message {
+    /** @type {string} */
+    name;
+    /** @type {boolean} */
+    spline;
+    /** @type {boolean} */
+    start;
+    /** @type {boolean} */
+    end;
+    /** @type {number} */
+    width;
+    /** @type {number} */
+    innerPadding;
+    /** @type {number} */
+    outerPadding;
+    /** @type {number} */
+    innerFade;
+    /** @type {number} */
+    outerFade;
+    /** @type {number} */
+    randomScale;
+    /** @type {number} */
+    meshOffset;
+    /** @type {number} */
+    terrainOffset;
+    /** @type {number} */
+    splat;
+    /** @type {number} */
+    topology;
+    /** @type {VectorData_C[]} */
+    nodes;
+}
+
+/**
+ * @extends {Message<PrefabData_C>}
+ */
+export class PrefabData_C extends Message  {
+    /** @type {string} */
+    category;
+    /** @type {number} */
+    id;
+    /** @type {VectorData_C} */
+    position;
+    /** @type {VectorData_C} */
+    rotation;
+    /** @type {VectorData_C} */
+    scale;
+}
+
+/**
+ * @extends {Message<MapData_C>}
+ */
+export class MapData_C extends Message {
+    /** @type {string} */
+    name;
+    /** @type {Uint8Array} */
+    data;
+}
+
+
+
 
 const VectorData = new Type("VectorData")
     .add(new Field("x", 1, "float"))
@@ -73,47 +152,61 @@ const MapData = new Type("MapData")
     .add(new Field("data", 2, "bytes"));
 
 
-const WorldData_pb = new Type("WorldData")
+export const WorldData_pb = new Type("WorldData")
+    .add(VectorData)
+    .add(MapData)
+    .add(PathData)
+    .add(PrefabData)
     .add(new Field("size", 1, "uint32"))
     .add(new Field("maps", 2, "MapData", "repeated"))
     .add(new Field("prefabs", 3, "PrefabData", "repeated"))
     .add(new Field("paths", 4, "PathData", "repeated"));
 
-const root = new Root().define("WorldData")
-    .add(WorldData_pb)
-    .add(VectorData)
-    .add(PathData)
-    .add(PrefabData)
-    .add(MapData);
-
-root.lookupType('WorldData.WorldData')
+// const root = new Root().define("WorldData")
+//     .add(WorldData_pb)
+//     .add(VectorData)
+//     .add(PathData)
+//     .add(PrefabData)
+//     .add(MapData);
 
 /**
  * 
+ * @extends {Message<WorldData>}
  * @category WorldData
  * @hideconstructor
  */
-export class WorldData {
+export class WorldData extends Message {
+    /** @type {number} */
+    size;
+    /** @type {MapData_C[]} */
+    maps;
+    /** @type {PrefabData_C[]} */
+    prefabs;
+    /** @type {PathData_C[]} */
+    paths;
+
     /**
      * 
      * @param {number} size 
-     * @param {protobuf.Message<WorldData_pb> | undefined} data 
+     * @param {Uint8Array | protobuf.Reader} data 
      */
     constructor(size, data) {
-        /** @type {number} */
+        super({$type: WorldData_pb});
         this.size = size;
-        /** @type {MapData[]} */
         this.maps = [];
-        /** @type {PrefabData[]} */
         this.prefabs = [];
-        /** @type {PathData[]} */
         this.paths = [];
 
         if (data) {
-            this.size = data.size;
-            this.maps = data.maps;
-            this.prefabs = data.prefabs;
-            this.paths = data.paths;
+            /** @type {*} */
+            const decoded = WorldData_pb.decode(data);
+            
+            // {maps: [], prefabs: [], paths: [], size: 2}
+            //const decoded = root.lookupType('WorldData.WorldData').decode(data)
+            this.size = decoded.size;
+            this.maps = decoded.maps;
+            this.prefabs = decoded.prefabs;
+            this.paths = decoded.paths;
         }
     }
 
@@ -123,7 +216,7 @@ export class WorldData {
      * @param {TerrainMap | TextMap} map 
      */
     addMap(mapName, map) {
-        let newMap = new MapData();
+        let newMap = new MapData_C();
         newMap.name = mapName;
         newMap.data = map.getDst();
 
@@ -147,18 +240,18 @@ export class WorldData {
     /**
      * 
      * @param {string | number} map 
-     * @param {number} channels 
-     * @param {string | "byte" | "short" | "int"} dataType 
-     * @returns {TerrainMap}
+     * @param {number | undefined} channels 
+     * @param {string | "byte" | "short" | "int" | undefined} dataType 
+     * @returns {TerrainMap | undefined}
      */
     getMapAsTerrain(map, channels = undefined, dataType = undefined) {
         if (this.maps == undefined) {
             return undefined;
         }
 
-        /** @type {MapData} */
+        /** @type {MapData_C | undefined} */
         let mapData;
-        /** @type {TerrainMap} */
+        /** @type {TerrainMap | undefined} */
         let terrainMap;
 
         if (typeof map == "number") {
@@ -166,6 +259,8 @@ export class WorldData {
         } else if (typeof map == "string") {
             mapData = this.maps.find(x => x.name == map);
         }
+
+        if (mapData == undefined) return undefined;
 
         if (channels != undefined && dataType != undefined) {
             terrainMap = new TerrainMap(mapData.data, channels, dataType, this.size);
@@ -225,7 +320,7 @@ export class WorldData {
             return undefined;
         }
 
-        /** @type {MapData} */
+        /** @type {MapData_C | undefined} */
         let mapData;
 
         if (typeof map == "number") {
