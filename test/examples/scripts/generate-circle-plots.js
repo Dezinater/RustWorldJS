@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as rustWorld from '../../../src/index.js';
 
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const WORLD_SIZE = 5000;
 const RADIUS = 45;
@@ -64,7 +64,7 @@ export default function generate_circle_plots() {
 
 	return rustWorld.writeMap(newWorld).then((bytes) => {
 		return new Promise((resolve, reject) => {
-			fs.writeFile(__dirname + '/../test-maps/circle-plots.map', bytes, 'binary', function (err) {
+			fs.writeFile(__dirname + '/test-maps/circle-plots.map', bytes, 'binary', function (err) {
 				if (err) reject(err);
 				resolve(true);
 			});

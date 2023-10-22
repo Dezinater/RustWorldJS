@@ -1,11 +1,11 @@
 import * as fs from 'fs/promises';
 import * as rustWorld from '../../../src/index.js';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-const inputMapFile = '/../../test'; //don't include map extension here
+const inputMapFile = '/../test'; //don't include map extension here
 
 export default async function generate_ice_walls() {
 	try {
@@ -26,7 +26,7 @@ export default async function generate_ice_walls() {
 
 		try {
 			const bytes = await rustWorld.writeMap(world);
-			await fs.writeFile(__dirname + '/../test-maps/ice-walls.map', bytes, 'binary');
+			await fs.writeFile(__dirname + '/test-maps/ice-walls.map', bytes, 'binary');
 			return true;
 		} catch (err) {
 			throw err;
