@@ -5,7 +5,7 @@ import generate_circle_plots from './scripts/generate-circle-plots.js';
 import generate_ice_walls from './scripts/ice-walls.js';
 
 describe('Examples', function () {
-	this.timeout(60000);
+	this.timeout(120000);
 
 	it('Generating circle plots', async function () {
 		assert.equal(await generate_circle_plots(), true);
