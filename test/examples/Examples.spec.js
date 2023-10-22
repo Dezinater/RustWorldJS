@@ -7,6 +7,14 @@ import generate_ice_walls from './scripts/ice-walls.js';
 describe('Examples', function () {
 	this.timeout(120000);
 
+	before(async function () {
+		try {
+			await fs.access('./test/examples/test-maps');
+		} catch (error) {
+			await fs.mkdir('./test/examples/test-maps');
+		}
+	});
+
 	it('Generating circle plots', async function () {
 		assert.equal(await generate_circle_plots(), true);
 	});
