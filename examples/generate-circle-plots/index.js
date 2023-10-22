@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as rustWorld from "rustworld";
+import * as rustWorld from "../../src/index.js";
 
 const WORLD_SIZE = 5000;
 const RADIUS = 45;

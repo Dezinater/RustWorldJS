@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as rustWorld from "rustworld";
+import * as rustWorld from "../../src/index.js";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 

@@ -2,18 +2,31 @@ import * as lz4 from "./lz4/lz4.js";
 import { BLOCK_SIZE, ChunkFlags, memcpy } from "./LZ4Helper.js";
 
 export default class LZ4Reader {
-    bytes: Uint8Array;
-    dataview: DataView;
-    _buffer: Uint8Array;
-    _bufferLength: number;
-    currentOutput: number[];
-    streamPosition: number;
-    ended: boolean;
-    finalSize: number;
-    finalOutput: Uint8Array;
-    finalChunks: Array<number>[];
+    /** @type {Uint8Array} */
+    bytes;
+    /** @type {DataView} */
+    dataview;
+    /** @type {Uint8Array} */
+    _buffer;
+    /** @type {number} */
+    _bufferLength;
+    /** @type {number[]} */
+    currentOutput;
+    /** @type {number} */
+    streamPosition;
+    /** @type {boolean} */
+    ended;
+    /** @type {number} */
+    finalSize;
+    /** @type {Uint8Array} */
+    finalOutput;
+    /** @type {Array<number>[]} */
+    finalChunks;
 
-    constructor(bytes: Uint8Array) {
+    /**
+     * @param {Uint8Array} bytes 
+     */
+    constructor(bytes) {
         this.bytes = bytes;
         this.dataview = new DataView(bytes.buffer);
         this._buffer = new Uint8Array(new ArrayBuffer(0));
@@ -53,7 +66,8 @@ export default class LZ4Reader {
             
             let varint = this.TryReadVarInt();
             if (varint == undefined) return false;
-            let flags = varint as ChunkFlags;
+            /** @type {ChunkFlags} */
+            let flags = varint;
             let isCompressed = (flags & ChunkFlags.Compressed) != 0;
 
             let originalLength = this.ReadVarInt();
@@ -122,7 +136,13 @@ export default class LZ4Reader {
         }
     }
 
-    ReadBlock(buffer: Uint8Array, offset: number, length: number) {
+    /**
+     * @param {Uint8Array} buffer 
+     * @param {number} offset 
+     * @param {number} length 
+     * @returns 
+     */
+    ReadBlock(buffer, offset, length) {
         let total = 0;
 
         while (length > 0) {
@@ -136,7 +156,13 @@ export default class LZ4Reader {
         return total;
     }
 
-    InnerStreamRead(output: Uint8Array, offset: number, length: number) {
+    /**
+     * @param {Uint8Array} output 
+     * @param {number} offset 
+     * @param {number} length 
+     * @returns 
+     */
+    InnerStreamRead(output, offset, length) {
         output = memcpy(this.streamPosition, offset, length, this.bytes, output);
         this.streamPosition += length;
         return length;

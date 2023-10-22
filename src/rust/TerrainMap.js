@@ -1,15 +1,28 @@
 export default class TerrainMap {
-    type: string;
-    res: number;
-    channels: number;
-    worldSize: number;
-    data: Array<Uint8Array | Uint16Array | Uint32Array>;
+    /** @type {"int" | "short" | "byte"} */
+    type;
+    /** @type {number} */
+    res;
+    /** @type {number} */
+    channels;
+    /** @type {number} */
+    worldSize;
+    /** @type {Array<Uint8Array | Uint16Array | Uint32Array>} */
+    data;
 
-    constructor(data: Uint8Array, channels: number, type: string | "int" | "short" | "byte", worldSize: number) {
+    /**
+     * 
+     * @param {Uint8Array} data 
+     * @param {number} channels 
+     * @param {"int" | "short" | "byte"} type 
+     * @param {number} worldSize 
+     */
+    constructor(data, channels, type, worldSize) {
         this.channels = channels;
         this.worldSize = worldSize;
         let offset = data.byteOffset;
-        let dst: Uint8Array | Uint16Array | Uint32Array;
+        /** @type {Uint8Array | Uint16Array | Uint32Array} */
+        let dst;
 
         //not sure why the data isnt aligned but aligning it like this fixes it
         if (type == "int" && offset % 4 != 0) {
@@ -38,6 +51,14 @@ export default class TerrainMap {
         this.type = type;
     }
 
+    /**
+     * @param {*} pixels 
+     * @param {number} w1 
+     * @param {number} h1 
+     * @param {number} w2 
+     * @param {number} h2 
+     * @returns {*}
+     */
     resize(pixels, w1, h1, w2, h2) { //nearest neighbour
         let temp = new pixels.constructor(Array(w2 * h2));
         let x_ratio = w1 / w2;
@@ -71,7 +92,13 @@ export default class TerrainMap {
         return this.data[channel][(x * this.worldSize) + y];
     }
 
-    set(value: number, x = 0, y = 0, channel = 0) {
+    /**
+     * @param {number} value 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} channel 
+     */
+    set(value, x = 0, y = 0, channel = 0) {
         this.data[channel][(x * this.worldSize) + y] = value;
     }
 
@@ -80,12 +107,22 @@ export default class TerrainMap {
         return this.get(x, y, channel) / maxValue;
     }
 
-    setNormalized(value: number, x = 0, y = 0, channel = 0) {
+    /**
+     * @param {number} value 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} channel 
+     */
+    setNormalized(value, x = 0, y = 0, channel = 0) {
         let maxValue = 2 ** (this.BytesPerElement() * 8) - 1;
         this.set(Math.min(1, value) * maxValue, x, y, channel);
     }
 
-    getChannel(channel: number) {
+    /**
+     * @param {number} channel 
+     * @returns 
+     */
+    getChannel(channel) {
         return this.data[channel];
     }
 

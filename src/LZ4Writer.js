@@ -4,18 +4,31 @@ import { BLOCK_SIZE } from "./LZ4Helper.js";
 const WORKERS_AMOUNT = 8;
 
 export default class LZ4Writer {
-    bytes: ArrayBuffer;
-    currentOutput: Uint8Array;
-    readPosition: number;
-    writePosition: number;
-    canWrite: boolean;
-    finalOutput: Uint8Array;
-    writeChunks: Array<Uint8Array>;
-    workersStarted: number;
-    workersDone: number;
-    workers: Array<Worker>;
+    /** @type {ArrayBuffer} */
+    bytes;
+    /** @type {Uint8Array} */
+    currentOutput;
+    /** @type {number} */
+    readPosition;
+    /** @type {number} */
+    writePosition;
+    /** @type {boolean} */
+    canWrite;
+    /** @type {Uint8Array} */
+    finalOutput;
+    /** @type {Array<Uint8Array>} */
+    writeChunks;
+    /** @type {number} */
+    workersStarted;
+    /** @type {number} */
+    workersDone;
+    /** @type {Array<Worker>} */
+    workers;
 
-    constructor(bytes: ArrayBuffer) {
+    /**
+     * @param {ArrayBuffer} bytes 
+     */
+    constructor(bytes) {
         this.bytes = bytes;
         this.canWrite = true;
         this.readPosition = 0;
@@ -53,6 +66,10 @@ export default class LZ4Writer {
         return this.finalOutput;
     }
 
+    /**
+     * 
+     * @returns {Promise<Uint8Array>}
+     */
     getOutput() {
         return new Promise((resolve) => {
             if (!this.canWrite) {
@@ -83,7 +100,10 @@ export default class LZ4Writer {
         });
     }
 
-    startWorker(worker: Worker) {
+    /**
+     * @param {Worker} worker 
+     */
+    startWorker(worker) {
         let size = Math.min(this.bytes.byteLength - (this.workersStarted * BLOCK_SIZE), BLOCK_SIZE);
         worker.postMessage({
             index: this.workersStarted,

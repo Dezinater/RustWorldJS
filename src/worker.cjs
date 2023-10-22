@@ -3,7 +3,6 @@ let importPromises = [
     import('./lz4/lz4.js').then(x => lz4 = x),
     import('./LZ4Helper.js').then(x => { BLOCK_SIZE = x.BLOCK_SIZE; ChunkFlags = x.ChunkFlags; }),
 ];
-
 let writePosition = 0;
 let currentOutput = new Array(0);
 
@@ -40,6 +39,9 @@ addEventListener('message', e => {
     });
 });
 
+/**
+ * @param {number} value 
+ */
 function WriteVarInt(value) {
     let bufferVal;
 

@@ -6,14 +6,23 @@ import LZ4Writer from './LZ4Writer.js';
 
 export { WorldData, TerrainMap, TextMap, LZ4Reader };
 
-export function readMap(bytes: ArrayBuffer) {
+/**
+ * 
+ * @param {ArrayBuffer} bytes 
+ * @returns {WorldData}
+ */
+export function readMap(bytes) {
     let rawBytes = new Uint8Array(bytes).slice(4, bytes.byteLength);
     let stream = new LZ4Reader(rawBytes);
-    return WorldData.decode(stream.getOutput());
+    return WorldData.decode(stream.getOutput()) //WorldData.decode(stream.getOutput()); //what it should be
 }
 
-export function writeMap(bytes: WorldData) {
-    let encoded = WorldData.encode(bytes).finish();
+/**
+ * 
+ * @param {WorldData} WorldDataObject
+ */
+export async function writeMap(WorldDataObject) {
+    let encoded = WorldData.encode(WorldDataObject).finish();
     let writer = new LZ4Writer(encoded);
     return writer.getOutput();
 }
