@@ -1,4 +1,5 @@
 import protobuf from 'protobufjs/light.js';
+import { createCanvas } from "canvas";
 
 import TerrainMap from "./TerrainMap.js";
 import TextMap from "./TextMap.js";
@@ -36,7 +37,7 @@ const TERRAIN_MAPS = {
 };
 
 const Message = protobuf.Message,
-    Type  = protobuf.Type,
+    Type = protobuf.Type,
     Field = protobuf.Field;
 
 /**
@@ -90,7 +91,7 @@ export class PathData_C extends Message {
 /**
  * @extends {Message<PrefabData_C>}
  */
-export class PrefabData_C extends Message  {
+export class PrefabData_C extends Message {
     /** @type {string} */
     category;
     /** @type {number} */
@@ -332,5 +333,55 @@ export class WorldData {
         if (mapData != undefined) {
             return new TextMap(mapData.data);
         }
+    }
+
+    async createImage() {
+        const canvas = createCanvas(this.size, this.size);
+        const ctx = canvas.getContext('2d');
+
+        let heightMap = this.getMapAsTerrain("height");
+        let biomeMap = this.getMapAsTerrain("biome");
+        let splatMap = this.getMapAsTerrain("splat");
+
+        const setImageData = (image, i, r, g, b, a) => {
+            image.data[i + 0] = r ;
+            image.data[i + 1] = g ;
+            image.data[i + 2] = b ;
+            image.data[i + 3] = a * 255;
+        }
+
+        let imageData = ctx.createImageData(this.size, this.size);
+        for (let x = 0; x < this.size; x++) {
+            for (let y = 0; y < this.size; y++) {
+                let i = ((x * this.size) + y) * 4;
+
+                let height = heightMap.getNormalized(x, y);
+
+                let dirt = splatMap.getNormalized(x, y, 0);
+                let dirtColor = [102, 51, 0, dirt* 255];
+
+                let snow = splatMap.getNormalized(x, y, 1);
+                let snowColor = [255, 255, 255, snow* 255];
+
+                let sand = splatMap.getNormalized(x, y, 2);
+                let sandColor = [12, 12, 23, sand * 255];
+
+                let rock = splatMap.getNormalized(x, y, 3);
+                let grass = splatMap.getNormalized(x, y, 4);
+                let forest = splatMap.getNormalized(x, y, 5);
+                let stone = splatMap.getNormalized(x, y, 6);
+                let gravel = splatMap.getNormalized(x, y, 7);
+
+                let colors = [snowColor,dirtColor,sandColor, ];
+                let finalColor = colors.reduce((current, total) => [total[0] + current[0], total[1] + current[1], total[2] + current[2], total[3] + current[3]]);
+                finalColor[0] /= colors.length;
+                finalColor[1] /= colors.length;
+                finalColor[2] /= colors.length;
+                setImageData(imageData, i, finalColor[0], finalColor[1], finalColor[2], finalColor[3]);
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL();
     }
 }

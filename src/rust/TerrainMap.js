@@ -88,7 +88,6 @@ export default class TerrainMap {
     }
 
     get(x = 0, y = 0, channel = 0) {
-        console.log(x, y, (x * this.worldSize) + y);
         return this.data[channel][(x * this.worldSize) + y];
     }
 
