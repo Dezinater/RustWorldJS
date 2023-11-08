@@ -9,7 +9,7 @@
 		"/src"
 	],
 	"scripts": {
-		"test": "mocha test/LoadMap.spec.js test/WriteMap.spec.js test/examples/Examples.spec.js",
+		"test": "mocha test/LoadMap.spec.js test/WriteMap.spec.js test/Examples.spec.js",
 		"test-RandW": "mocha test/LoadMap.spec.js test/WriteMap.spec.js",
 		"test-Examples": "mocha test/Examples.spec.js"
 	},
