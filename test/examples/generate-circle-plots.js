@@ -1,17 +1,17 @@
 import * as fs from 'fs';
-import * as rustWorld from '../../../src/index.js';
+import * as rustWorld from '../../src/index.js';
 
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = join(dirname(fileURLToPath(import.meta.url)), '..');
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const WORLD_SIZE = 5000;
 const RADIUS = 45;
 const SPACING = 25;
 const WALL_SIZE = 4;
 
-export default function generate_circle_plots() {
+export default function generateCirclePlots() {
 	let newWorld = new rustWorld.WorldData(WORLD_SIZE);
 	let terrainMap = /** @type {rustWorld.TerrainMap} */ (newWorld.createEmptyTerrainMap('terrain'));
 	let heightMap = /** @type {rustWorld.TerrainMap} */ (newWorld.createEmptyTerrainMap('height'));
