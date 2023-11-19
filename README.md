@@ -30,10 +30,10 @@ fs.readFile(__dirname + '/../../test/test.map', function (err, fileContents) {
 
 The package comes with Typescript definitions so if you are using Typescript you will be able to see every method and class available to use. To get started take a look at the examples for some code samples.
 
- - [generate-circle-plots](https://github.com/Dezinater/RustWorldJS/tree/master/examples/generate-circle-plots)
- - [get-map-size](https://github.com/Dezinater/RustWorldJS/tree/master/examples/get-map-size)
- - [get-terrainmap-info](https://github.com/Dezinater/RustWorldJS/tree/master/examples/get-terrainmap-info)
- - [ice-walls](https://github.com/Dezinater/RustWorldJS/tree/master/examples/ice-walls)
+ - [get-map-size](https://github.com/Dezinater/RustWorldJS/tree/master/test/examples/get-map-size.js)
+ - [get-terrainmap-info](https://github.com/Dezinater/RustWorldJS/tree/master/test/examples/get-terrainmap-info.js)
+ - [generate-circle-plots](https://github.com/Dezinater/RustWorldJS/tree/master/test/examples/generate-circle-plots.js)
+ - [ice-walls](https://github.com/Dezinater/RustWorldJS/tree/master/test/examples/ice-walls.js)
 
 
 ## LZ4 Compression

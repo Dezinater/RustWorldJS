@@ -1,29 +1,31 @@
 {
-  "name": "rustworld",
-  "version": "1.0.3",
-  "type": "module",
-  "license": "BSD-2-Clause",
-  "exports": "./src/index.js",
-  "main": "./src/index.js",
-  "files": [
-    "/src"
-  ],
-  "scripts": {
-    "test": "mocha"
-  },
-  "directories": {
-    "lib": "./src",
-    "test": "./test"
-  },
-  "dependencies": {
-    "protobufjs": "^7.1.1",
-    "web-worker": "^1.2.0"
-  },
-  "devDependencies": {
-    "mocha": "^10.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Dezinater/RustWorldJS.git"
-  }
+	"name": "rustworld",
+	"version": "1.0.3",
+	"type": "module",
+	"license": "BSD-2-Clause",
+	"exports": "./src/index.js",
+	"main": "./src/index.js",
+	"files": [
+		"/src"
+	],
+	"scripts": {
+		"test": "mocha test/LoadMap.spec.js test/WriteMap.spec.js test/Examples.spec.js",
+		"test-RandW": "mocha test/LoadMap.spec.js test/WriteMap.spec.js",
+		"test-Examples": "mocha test/Examples.spec.js"
+	},
+	"directories": {
+		"lib": "./src",
+		"test": "./test"
+	},
+	"dependencies": {
+		"protobufjs": "^7.1.1",
+		"web-worker": "^1.2.0"
+	},
+	"devDependencies": {
+		"mocha": "^10.0.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Dezinater/RustWorldJS.git"
+	}
 }
